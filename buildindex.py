@@ -1,8 +1,15 @@
 import pickle
+from collections import defaultdict
+from config import config_params
+import indexes as index
 
-#TODO: read the preprocessed index files and build inverted index and write it to file
+with open("data/data.pkl", "rb") as f:
+  data_dict = pickle.load(f)
 
-with open("data/rowdict.pkl", "rb") as f:
-  rowdict = pickle.load(f)
+if config_params["index"] == "tfidf":
+  index = index.TFIDFIndex(data_dict['rowterms'])
 
-print(len(rowdict))
+for docid in index.query("brazil's government is defending its plan to build dozens of huge hydro-electric dams")[:10]:
+  print(data_dict['rowsnip'][docid[0]])
+  print(*data_dict['rowdict'][docid[0]], docid[1])
+  print()
