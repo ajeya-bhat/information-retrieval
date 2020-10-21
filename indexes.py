@@ -1,6 +1,8 @@
 from collections import defaultdict, Counter
 from math import log10, sqrt
 from preprocess import preprocess_sentence
+from config import config_params
+from functools import reduce
 
 class Index:
   def query(self, q):
@@ -28,7 +30,13 @@ class TFIDFIndex(Index):
       self.idf[term] = log10(self.ndocs/len(self.idf[term]) + 1e-10)
 
   def tfidf_score(self, tf, idf):
-      return log10(1+tf)*idf
+    if config_params['tf_scheme'] == '1':
+      tf_idf=tf*idf
+    if config_params['tf_scheme'] == '1':
+      tf_idf=1+log10(tf+1e-10)
+    if config_params['tf_scheme'] == '1':
+      tf_idf=log10(1+tf)*idf
+    return tf_idf
 
   def query(self, query_string):
     #returns a sorted list of docids, with decreasing cosine similarity
@@ -59,4 +67,27 @@ class TFIDFIndex(Index):
         cosine_similarity[doc] = dotproducts[doc] / (query_magnitude * sqrt(magnitude[doc]) + 1e-10)
 
     ranked_docs = list(cosine_similarity.items())
-    return sorted(ranked_docs, key = lambda x : x[1], reverse = True)
+
+    ranked_docs = sorted(ranked_docs, key = lambda x : x[1], reverse = True)
+    return [i[0] for i in ranked_docs]
+
+class BooleanQuery:
+  index = defaultdict(set) #index[term][docid] = tf(doc, term)
+  ndocs = 0
+
+  def __init__(self, corpus_dictionary):
+
+    self.ndocs = len(corpus_dictionary)
+    for doc in corpus_dictionary:
+      for term in corpus_dictionary[doc]:
+        self.index[term].add(doc)
+  
+  def query(self, query_string):
+    query_terms = preprocess_sentence(query_string)
+    query_terms.sort(key=lambda x: len(self.index[x]))
+    return list(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
+
+
+
+      
+
