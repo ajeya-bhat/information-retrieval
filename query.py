@@ -10,12 +10,17 @@ def preprocess_query(query):
   show = None
 
   if '`' in query:
-    #extract the field, remove "in:"
-    channel = query.split()[0][1:-1]
-    #strip the channel condition from the query
-    query = " ".join(query.split()[1:])
+    #extract the field
+    bt1 = query.index('`')
+    bt2 = query.index('`', query.index('`')+1)
+
+    channel = query[bt1+1:bt2]
+
     if '/' in channel:
       channel, show = channel.split('/')
+
+    #strip the channel condition from the query
+    query = query[bt2+1:]
   return query, channel, show
 
 def postprocess_query(docs, channel, show):
@@ -37,7 +42,7 @@ elif config_params["index"] == "boolean":
 
 
 
-query = " `bbcnews/hardtalk` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+query = " `bbcnews/bbc news` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
 query, channel, show = preprocess_query(query)
 docs = index.query(query)
 docs = postprocess_query(docs, channel, show)
