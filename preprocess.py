@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     for index, row in df.iterrows():
       docid += 1
-      rowdict[docid] = (index, os.path.join('TelevisionNews', i))
+      rowdict[docid] = (index, os.path.join('TelevisionNews', i), str(row['Station']).lower(), str(row["Show"]).lower())
       rowsnip[docid] = row["Snippet"]
 
 
