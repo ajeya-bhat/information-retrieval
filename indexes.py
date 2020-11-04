@@ -30,11 +30,11 @@ class TFIDFIndex(Index):
       self.idf[term] = log10(self.ndocs/len(self.idf[term]) + 1e-10)
 
   def tfidf_score(self, tf, idf):
-    if config_params['tf_scheme'] == '1':
+    if config_params['tf_scheme'] == 1:
       tf_idf=tf*idf
-    if config_params['tf_scheme'] == '1':
+    if config_params['tf_scheme'] == 2:
       tf_idf=1+log10(tf+1e-10)
-    if config_params['tf_scheme'] == '1':
+    if config_params['tf_scheme'] == 3:
       tf_idf=log10(1+tf)*idf
     return tf_idf
 

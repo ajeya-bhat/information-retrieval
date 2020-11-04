@@ -40,7 +40,7 @@ def preprocess_sentence(w):
   w=w.replace('!','')
 
   # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-  w = re.sub(r"[^a-zA-Z?.!,¿]+", " ", w)
+  w = re.sub(r"[^a-zA-Z?.!,¿*]+", " ", w)
 
   w = w.strip()
 
@@ -49,15 +49,15 @@ def preprocess_sentence(w):
   for i in tokenized_list:
     #root form reductions based on condition
     i=i.strip()
-    if config_params['preprocess_type']=='stemming':
+    if config_params['preprocess_type']==1:
       i=ps.stem(i)
-    elif config_params['preprocess_type']=='lemmatization':
+    elif config_params['preprocess_type']==2:
       i=lemmatizer.lemmatize(i)
-    if config_params["stopword_removal"] and i in  stopword_set:
+    if config_params["stopword_removal"]==1 and i in  stopword_set:
       continue
 
     preprocessed_sent.append(i)
-  
+  print(preprocessed_sent)
   return preprocessed_sent
 
 if __name__ == "__main__":

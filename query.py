@@ -9,6 +9,7 @@ def preprocess_query(query):
   channel = None
   show = None
 
+
   if '`' in query:
     #extract the field
     bt1 = query.index('`')
@@ -35,14 +36,14 @@ def postprocess_query(docs, channel, show):
 with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
 
-if config_params["index"] == "tfidf":
+if config_params["index"] == 1:
   index = index.TFIDFIndex(data_dict['rowterms'])
-elif config_params["index"] == "boolean":
+elif config_params["index"] == 2:
   index=index.BooleanQuery(data_dict['rowterms'])
 
 
 
-query = " `bbcnews/bbc news` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+query = " `bbcnews/bbc news` brazil's governmen* is defending its plan to build dozens of huge hydro-electric dams"
 query, channel, show = preprocess_query(query)
 docs = index.query(query)
 docs = postprocess_query(docs, channel, show)
