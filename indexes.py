@@ -19,7 +19,7 @@ class Index:
       words_list = set(words.words()).union(data_dict['word_corpus'])
 
       for word in split_query:
-        if word not in words_list:
+        if word not in words_list and '*' not in word:
           print(word, "is not in dict")
           #process
           words_distance = zip(words_list, map(lambda x : edit_distance(word, x), words_list))
@@ -28,7 +28,6 @@ class Index:
           print("replaced with", word)
         result.append(word)
       query = result
-
     return " ".join(query)
 
   def query(self, q):
@@ -118,6 +117,10 @@ class BooleanQuery(Index):
   def query(self, query_string):
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
+    print(query_terms,2)
+    for term in query_terms:
+      if '*' in term:
+        pass
     query_terms.sort(key=lambda x: len(self.index[x]))
     return list(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
 

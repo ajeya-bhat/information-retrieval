@@ -38,13 +38,15 @@ def preprocess_sentence(w):
   w=w.replace('.','')
   w=w.replace(',','')
   w=w.replace('!','')
-
+  
   # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
   w = re.sub(r"[^a-zA-Z?.!,¿*]+", " ", w)
-
+  
   w = w.strip()
-
-  tokenized_list = nltk.word_tokenize(w)
+  if "*" not in w:
+    tokenized_list = nltk.word_tokenize(w)
+  else:
+    tokenized_list = w.split(" ")
   preprocessed_sent  = []
   for i in tokenized_list:
     #root form reductions based on condition
