@@ -3,10 +3,36 @@ from math import log10, sqrt
 from preprocess import preprocess_sentence
 from config import config_params
 from functools import reduce
+from nltk.corpus import words
+from nltk.metrics import edit_distance
+import pickle
+
+with open("data/data.pkl", "rb") as f:
+  data_dict = pickle.load(f)
 
 class Index:
+  def process_spell_errors(self, query):
+    if config_params["spell_check"]:
+      split_query = query.split()
+      result = []
+      words_list = set(words.words()).union(data_dict['word_corpus'])
+
+      for word in split_query:
+        if word not in words_list:
+          print(word, "is not in dict")
+          #process
+          words_distance = zip(words_list, map(lambda x : edit_distance(word, x), words_list))
+          best_word = reduce(lambda x,y : x if x[1]<=y[1] else y, words_distance)[0]
+          word = best_word
+          print("replaced with", word)
+        result.append(word)
+      query = result
+
+    return " ".join(query)
+
   def query(self, q):
     pass
+
   def __init__(self, corpus_dictionary):
     pass
 
@@ -40,6 +66,7 @@ class TFIDFIndex(Index):
 
   def query(self, query_string):
     #returns a sorted list of docids, with decreasing cosine similarity
+    query_string = self.process_spell_errors(query_string)
 
     query_terms = preprocess_sentence(query_string)
     query_frequencies = Counter(query_terms) #query_term : frequency(query_term) in the query
@@ -83,6 +110,7 @@ class BooleanQuery:
         self.index[term].add(doc)
   
   def query(self, query_string):
+    query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
     query_terms.sort(key=lambda x: len(self.index[x]))
     return list(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))

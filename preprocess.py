@@ -57,7 +57,6 @@ def preprocess_sentence(w):
       continue
 
     preprocessed_sent.append(i)
-  print(preprocessed_sent)
   return preprocessed_sent
 
 if __name__ == "__main__":
@@ -68,6 +67,8 @@ if __name__ == "__main__":
   rowsnip = {}
   #a dictionary that maps a row to its term list 
   rowterms = {}
+  word_corpus = set()
+
   docid = 0
 
   for i in os.listdir('TelevisionNews'):
@@ -81,6 +82,7 @@ if __name__ == "__main__":
       docid += 1
       rowdict[docid] = (index, os.path.join('TelevisionNews', i), str(row['Station']).lower(), str(row["Show"]).lower())
       rowsnip[docid] = row["Snippet"]
+      word_corpus.update(row["Snippet"].split())
 
 
   for doc in tqdm(rowsnip):
@@ -88,5 +90,5 @@ if __name__ == "__main__":
 
   #write the preprocessed document pickle files.
   with open("data/data.pkl", "wb") as f:
-    pickle.dump({"rowsnip" : rowsnip, "rowterms":rowterms, "rowdict" : rowdict}, f)
+    pickle.dump({"rowsnip" : rowsnip, "rowterms":rowterms, "rowdict" : rowdict, "word_corpus" : word_corpus}, f)
 
