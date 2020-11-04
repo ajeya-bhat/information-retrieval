@@ -7,6 +7,7 @@ from nltk.corpus import words
 from nltk.metrics import edit_distance
 import pickle
 from bstree import BSTNode
+import bstree
 
 with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
@@ -102,6 +103,8 @@ class BooleanQuery(Index):
   index = defaultdict(set) #index[term][docid] = tf(doc, term)
   ndocs = 0
   term_set=set()
+  reversed_set=set()
+  reverse_terms=[]
   term_list=[]
 
   def __init__(self, corpus_dictionary):
@@ -109,10 +112,14 @@ class BooleanQuery(Index):
     self.ndocs = len(corpus_dictionary)
     for doc in corpus_dictionary:
       for term in corpus_dictionary[doc]:
+        self.reversed_set.add(term[::-1])
+
         self.term_set.add(term)
         self.index[term].add(doc)
     self.term_list=sorted(list(self.term_set))[2:]
+    self.reverse_terms=sorted(list(self.reversed_set))[2:]
     self.tree=BSTNode(self.term_list)#bst of terms
+    self.reverse_tree=BSTNode(self.reverse_terms)#bst of terms reversed
     
   def query(self, query_string):
     query_string = self.process_spell_errors(query_string)
@@ -120,7 +127,16 @@ class BooleanQuery(Index):
     print(query_terms,2)
     for term in query_terms:
       if '*' in term:
-        pass
+        if term[:-1]=='*':
+          term=term[:-1]
+          node=BSTNode.search(term)
+          node=bstree.inOrderSuccessor(tree, node)
+        else:
+          star_index=term.index('*')
+          prefix_term=term[:star_index]
+          suffix_term=term[star_index+1:]
+          front_node=BSTNode.search(prefix_term)
+          back_node=BSTNode.search(suffix_term)
     query_terms.sort(key=lambda x: len(self.index[x]))
     return list(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
 
