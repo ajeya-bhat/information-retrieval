@@ -23,9 +23,27 @@ class BSTNode:
         return None
       return self.r.search(string)
 
-class BST:
-  def __init__(self, token_list):
-    self.root = BSTNode(token_list)
+def minValue(node):
+    current = node
+    # loop down to find the leftmost leaf 
+    while(current is not None):
+        if current.left is None:
+            break
+        current = current.left
+    return current
 
-  def search(self, string):
-    pass
+def inOrderSuccessor(root, n):
+    # Step 1 of the above algorithm 
+    if n.r is not None:
+        return minValue(n.right)
+    # Step 2 of the above algorithm 
+    succ=None
+    while(root):
+        if(root.data<n.data):
+            root=root.r
+        elif(root.data>n.data):
+            succ=root
+            root=root.l
+        else:
+            break
+    return succ
