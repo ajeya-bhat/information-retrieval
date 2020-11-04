@@ -6,6 +6,7 @@ from functools import reduce
 from nltk.corpus import words
 from nltk.metrics import edit_distance
 import pickle
+from bstree import BSTNode
 
 with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
@@ -98,24 +99,25 @@ class TFIDFIndex(Index):
     ranked_docs = sorted(ranked_docs, key = lambda x : x[1], reverse = True)
     return [i[0] for i in ranked_docs]
 
-class BooleanQuery:
+class BooleanQuery(Index):
   index = defaultdict(set) #index[term][docid] = tf(doc, term)
   ndocs = 0
+  term_set=set()
+  term_list=[]
 
   def __init__(self, corpus_dictionary):
 
     self.ndocs = len(corpus_dictionary)
     for doc in corpus_dictionary:
       for term in corpus_dictionary[doc]:
+        self.term_set.add(term)
         self.index[term].add(doc)
-  
+    self.term_list=sorted(list(self.term_set))[2:]
+    self.tree=BSTNode(self.term_list)#bst of terms
+    
   def query(self, query_string):
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
     query_terms.sort(key=lambda x: len(self.index[x]))
     return list(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
-
-
-
-      
 

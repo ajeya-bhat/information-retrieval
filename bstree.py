@@ -3,12 +3,12 @@ import pickle
 class BSTNode:
   def __init__(self, token_list):
     #token list is a nonempty, sorted list of token strings
-    mid = len(token_list)
+    mid = len(token_list)//2
     self.l = self.r = None
     self.val = token_list[mid]
     if mid!=0:
       self.l = BSTNode(token_list[:mid])
-    if mid!=len(token_list):
+    if len(token_list)>1 and mid !=len(token_list)-1:
       self.r = BSTNode(token_list[mid+1:])
 
   def search(self, string):
@@ -28,4 +28,4 @@ class BST:
     self.root = BSTNode(token_list)
 
   def search(self, string):
-    
+    pass
