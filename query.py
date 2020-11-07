@@ -48,5 +48,4 @@ docs = postprocess_query(docs, channel, show)
 
 for docid in docs[:10]:
   print(data_dict['rowsnip'][docid])
-  print(*data_dict['rowdict'][docid])
   print()
