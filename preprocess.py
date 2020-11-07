@@ -12,7 +12,7 @@ import pandas as pd
 import sys
 import nltk
 
-from nltk.stem import WordNetLemmatizer, PorterStemmer  
+from nltk.stem import WordNetLemmatizer, PorterStemmer
 from nltk.corpus import stopwords
 from config import config_params
 
