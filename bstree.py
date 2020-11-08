@@ -12,12 +12,10 @@ class BSTNode:
       self.r = BSTNode(token_list[mid+1:])
 
   def search(self, string):
-    print(self.val)
     if self.val == string:
       return self
     if self.val > string:
       if self.l is None:
-        print(string, self.l.val,2) #tell when back
         return self
       return self.l.search(string) or self
     else:

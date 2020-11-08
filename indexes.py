@@ -146,22 +146,18 @@ class BooleanQuery(Index):
           pref_terms = []
           suff_terms = []
           star_index=term.index('*')
-
-          print(term,star_index)
           prefix_term=term[:star_index]
 
           suffix_term=term[star_index+1:]
-          print(prefix_term,suffix_term)
           node = self.tree.search(prefix_term)
-          while node and node.val < term[:-1]+chr(ord(term[-1])+1):
+          while node and node.val < prefix_term[:-1]+chr(ord(prefix_term[-1])+1):
             pref_terms.append(node.val)
             node=bstree.inOrderSuccessor(self.tree, node)
           suffix_term = suffix_term[::-1]
           node=self.reverse_tree.search(suffix_term)
           while node and node.val < suffix_term[:-1]+chr(ord(suffix_term[-1])+1):
-            suff_terms.append(node.val)
-            node=bstree.inOrderSuccessor(self.tree, node)
-          print(pref_terms,suff_terms)
+            suff_terms.append(node.val[::-1])
+            node=bstree.inOrderSuccessor(self.reverse_tree, node)
           result_docs.update(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
       else:
           new_query_terms.append(term)
@@ -169,6 +165,8 @@ class BooleanQuery(Index):
     query_terms.sort(key=lambda x: len(self.index[x]))
     if star_flag==1:
       set1=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
-      list(set1.intersection(result_docs))
+      print(set1)
+      print(result_docs)
+      return list(set1.intersection(result_docs))
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
 

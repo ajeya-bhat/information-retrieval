@@ -41,24 +41,35 @@ def preprocess_sentence(w):
   
   # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
   w = re.sub(r"[^a-zA-Z?.!,¿*]+", " ", w)
-  print(w)
+  preprocessed_sent  = []
   w = w.strip()
   if "*" not in w:
     tokenized_list = nltk.word_tokenize(w)
+    for i in tokenized_list:
+      if config_params['preprocess_type']==1:
+          i=ps.stem(i)
+      elif config_params['preprocess_type']==2:
+        i=lemmatizer.lemmatize(i)
+      if config_params["stopword_removal"]==1 and i in  stopword_set:
+        continue
+      preprocessed_sent.append(i)
   else:
     tokenized_list = w.split()
-  preprocessed_sent  = []
-  for i in tokenized_list:
+    for i in tokenized_list:
+      i=i.strip()
+      if '*' in i:
+        preprocessed_sent.append(i)
+        continue
+      elif config_params['preprocess_type']==1:
+        i=ps.stem(i)
+      elif config_params['preprocess_type']==2:
+        i=lemmatizer.lemmatize(i)
+      if config_params["stopword_removal"]==1 and i in  stopword_set:
+        continue
+      preprocessed_sent.append(i)
+  
+  
     #root form reductions based on condition
-    i=i.strip()
-    if config_params['preprocess_type']==1:
-      i=ps.stem(i)
-    elif config_params['preprocess_type']==2:
-      i=lemmatizer.lemmatize(i)
-    if config_params["stopword_removal"]==1 and i in  stopword_set:
-      continue
-
-    preprocessed_sent.append(i)
   return preprocessed_sent
 
 if __name__ == "__main__":
