@@ -16,9 +16,10 @@ class BSTNode:
     if self.val == string:
       return self
     if self.val > string:
-      if self.l is None or self.l.val < string:
+      if self.l is None:
+        print(string, self.l.val,2) #tell when back
         return self
-      return self.l.search(string)
+      return self.l.search(string) or self
     else:
       if self.r is None:
         return None
