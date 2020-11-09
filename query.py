@@ -44,17 +44,6 @@ def postprocess_query(docs,scores, filters):
         score.append(scores[i])
   return result,scores
 
-#load the processed pickle file
-with open("data/data.pkl", "rb") as f:
-  data_dict = pickle.load(f)
-
-if config_params["index"] == 1:
-  index = index.TFIDFIndex(data_dict['rowterms'])
-elif config_params["index"] == 2:
-  index=index.BooleanQuery(data_dict['rowterms'])
-
-query = "`BBCNEWS.201701:bbcnews` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
-#query="scientific community"
 
 @timer_decorator
 def perform_query(query):
@@ -125,4 +114,16 @@ def main():
 
 
 if __name__ == "__main__":
+  
+  #load the processed pickle file
+  with open("data/data.pkl", "rb") as f:
+    data_dict = pickle.load(f)
+
+  if config_params["index"] == 1:
+    index = index.TFIDFIndex(data_dict['rowterms'])
+  elif config_params["index"] == 2:
+    index=index.BooleanQuery(data_dict['rowterms'])
+
+  query = "`BBCNEWS.201701:bbcnews` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+  #query="scientific community"
   main()
