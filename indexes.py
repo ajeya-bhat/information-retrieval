@@ -141,34 +141,52 @@ class BooleanQuery(Index):
           while node and node.val < term[:-1]+chr(ord(term[-1])+1):
             temp_terms.append(node.val)
             node=bstree.inOrderSuccessor(self.tree, node)
-          result_docs.update(self.query_or(temp_terms))
+          if len(result_docs)==0:
+
+            result_docs.update(self.query_or(temp_terms))
+          else:
+            result_docs=result_docs.intersection(self.query_or(temp_terms))
+
+        elif term[0]=='*':
+          term=term[1:][::-1]
+          temp_terms = []
+          node=self.reverse_tree.search(term)
+          while node and node.val < term[:-1]+chr(ord(term[-1])+1):
+            temp_terms.append(node.val[::-1])
+            node=bstree.inOrderSuccessor(self.reverse_tree, node)
+          if len(result_docs)==0:
+            result_docs.update(self.query_or(temp_terms))
+          else:
+            result_docs=result_docs.intersection(self.query_or(temp_terms))
         else:
           pref_terms = []
           suff_terms = []
           star_index=term.index('*')
-
-          print(term,star_index)
           prefix_term=term[:star_index]
-
           suffix_term=term[star_index+1:]
-          print(prefix_term,suffix_term)
+
           node = self.tree.search(prefix_term)
-          while node and node.val < term[:-1]+chr(ord(term[-1])+1):
+          while node and node.val < prefix_term[:-1]+chr(ord(prefix_term[-1])+1):
             pref_terms.append(node.val)
             node=bstree.inOrderSuccessor(self.tree, node)
           suffix_term = suffix_term[::-1]
           node=self.reverse_tree.search(suffix_term)
           while node and node.val < suffix_term[:-1]+chr(ord(suffix_term[-1])+1):
-            suff_terms.append(node.val)
-            node=bstree.inOrderSuccessor(self.tree, node)
-          print(pref_terms,suff_terms)
-          result_docs.update(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
+            suff_terms.append(node.val[::-1])
+            node=bstree.inOrderSuccessor(self.reverse_tree, node)  
+          if len(result_docs)==0:
+            result_docs.update(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
+          else:
+            result_docs=result_docs.intersection(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
       else:
           new_query_terms.append(term)
     query_terms=new_query_terms
     query_terms.sort(key=lambda x: len(self.index[x]))
     if star_flag==1:
-      set1=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
-      return list(set1.intersection(result_docs))
+      if(len(query_terms)!=0):
+        result_docs=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))).intersection(result_docs)
+      return list(result_docs)
+    if(len(query_terms)==0):
+      return list()
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
 
