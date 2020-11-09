@@ -169,6 +169,6 @@ class BooleanQuery(Index):
     query_terms.sort(key=lambda x: len(self.index[x]))
     if star_flag==1:
       set1=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))
-      list(set1.intersection(result_docs))
+      return list(set1.intersection(result_docs))
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
 
