@@ -24,13 +24,16 @@ def preprocess_query(query):
     query = query[bt2+1:]
   return query, channel, show
 
-def postprocess_query(docs, channel, show):
+def postprocess_query(docs,scores, channel, show):
   result = []
+  score=[]
   #postprocess the docs and maintain only the ones with the given show/channel
-  for doc in docs:
-    if (not channel or data_dict['rowdict'][doc][2] == channel) and (not show or data_dict['rowdict'][doc][3] == show):
-      result.append(doc)
-  return result
+  for i in range(len(docs)):
+    if (not channel or data_dict['rowdict'][docs[i]][2] == channel) and (not show or data_dict['rowdict'][docs[i]][3] == show):
+      result.append(docs[i])
+      if(config_params['index']==1):
+        score.append(scores[i])
+  return result,scores
 
 #load the processed pickle file
 with open("data/data.pkl", "rb") as f:
@@ -41,11 +44,16 @@ if config_params["index"] == 1:
 elif config_params["index"] == 2:
   index=index.BooleanQuery(data_dict['rowterms'])
 
-#query = "brazif g*ment is defending its plan to build dozens of huge hydro-electric dams"
-query="scientif*c communit*"
+query = "`bbcnews` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+#query="scientific community"
 query, channel, show = preprocess_query(query)
 docs = index.query(query)
-docs = postprocess_query(docs, channel, show)
+if config_params['index']==1:
+  scores=[i[1] for i in docs]
+  docs=[i[0] for i in docs]
+else:
+  scores=[]
+docs,scores = postprocess_query(docs,scores, channel, show)
 
 json_res={}
 if config_params['index']==1:
@@ -57,7 +65,6 @@ if config_params['stopword_removal']==1:
   json_res['stopword_removal']=True
 else:
   json_res['stopword_removal']=False
-
 if config_params['preprocess_type']==1:
   json_res['preprocessing']="stemming"
 elif config_params['preprocess_type']==2:
@@ -82,16 +89,22 @@ if len(docs)>100:
   json_res['number_of_hits']='100+'
 else:
   json_res['number_of_hits']=len(docs)
+
 if(len(docs)>100):
   docs=docs[:100]
+  if config_params['index']==1:
+    scores=scores[:100]
+
 json_res['hits']=[]
-for docid in docs:
+for j in range(len(docs)):
   resdict={}
-  resdict['id']=data_dict['rowdict'][docid][0]
-  resdict['document_name']=data_dict['rowdict'][docid][1]
-  resdict['station']=data_dict['rowdict'][docid][2]
-  resdict['show']=data_dict['rowdict'][docid][3]
-  resdict['snippet']=data_dict['rowsnip'][docid]
+  resdict['id']=data_dict['rowdict'][docs[j]][0]
+  resdict['document_name']=data_dict['rowdict'][docs[j]][1]
+  resdict['station']=data_dict['rowdict'][docs[j]][2]
+  resdict['show']=data_dict['rowdict'][docs[j]][3]
+  resdict['snippet']=data_dict['rowsnip'][docs[j]]
+  if config_params['index']==1:
+    resdict['score']=scores[j]
   json_res['hits'].append(resdict)
 
 print(json.dumps(json_res,indent=1))

@@ -98,7 +98,7 @@ class TFIDFIndex(Index):
     ranked_docs = list(cosine_similarity.items())
 
     ranked_docs = sorted(ranked_docs, key = lambda x : x[1], reverse = True)
-    return [i[0] for i in ranked_docs]
+    return ranked_docs
 
 class BooleanQuery(Index):
   index = defaultdict(set) #index[term][docid] = tf(doc, term)
@@ -185,10 +185,13 @@ class BooleanQuery(Index):
     query_terms=new_query_terms
     query_terms.sort(key=lambda x: len(self.index[x]))
 
+    #if it is a wild card query
     if star_flag==1:
       if(len(query_terms)!=0):
         result_docs=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))).intersection(result_docs)
       return list(result_docs)
+
+
     if(len(query_terms)==0):
       return list()
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
