@@ -110,11 +110,13 @@ class BooleanQuery(Index):
   def __init__(self, corpus_dictionary):
 
     self.ndocs = len(corpus_dictionary)
+
     for doc in corpus_dictionary:
       for term in corpus_dictionary[doc]:
         self.reversed_set.add(term[::-1])
         self.term_set.add(term)
         self.index[term].add(doc)
+
     self.term_list=sorted(list(self.term_set))[2:]
     self.reverse_terms=sorted(list(self.reversed_set))[2:]
     self.tree=BSTNode(self.term_list)#bst of terms
@@ -125,63 +127,64 @@ class BooleanQuery(Index):
     res= list(reduce(lambda x,y:x.union(y),map(lambda x:self.index[x], query_terms)))
     return res
 
+  def get_words_from_tree(self, tree, term):
+    temp_terms = []
+    node=tree.search(term)
+    while node and node.val < term[:-1]+chr(ord(term[-1])+1):
+      temp_terms.append(node.val)
+      node=bstree.inOrderSuccessor(tree, node)
+    return temp_terms
+
+  def update_doclist(self, result_docs, terms):
+    ans = set(result_docs)
+    if len(result_docs)==0:
+      ans.update(self.query_or(terms))
+    else:
+      ans=result_docs.intersection(self.query_or(terms))
+    return ans
+
   def query(self, query_string):
     star_flag=0
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
     result_docs = set()
     new_query_terms=[]
+
     for term in query_terms:
       if '*' in term:
+        #prefix query
         star_flag=1
         if term[-1]=='*':
           term=term[:-1]
-          temp_terms = []
-          node=self.tree.search(term)
-          while node and node.val < term[:-1]+chr(ord(term[-1])+1):
-            temp_terms.append(node.val)
-            node=bstree.inOrderSuccessor(self.tree, node)
-          if len(result_docs)==0:
-
-            result_docs.update(self.query_or(temp_terms))
-          else:
-            result_docs=result_docs.intersection(self.query_or(temp_terms))
+          temp_terms = self.get_words_from_tree(self.tree, term)
+          result_docs = self.update_doclist(result_docs, temp_terms)
 
         elif term[0]=='*':
+          #suffix query
           term=term[1:][::-1]
           temp_terms = []
-          node=self.reverse_tree.search(term)
-          while node and node.val < term[:-1]+chr(ord(term[-1])+1):
-            temp_terms.append(node.val[::-1])
-            node=bstree.inOrderSuccessor(self.reverse_tree, node)
-          if len(result_docs)==0:
-            result_docs.update(self.query_or(temp_terms))
-          else:
-            result_docs=result_docs.intersection(self.query_or(temp_terms))
+          temp_terms = self.get_words_from_tree(self.reverse_tree, term)
+          result_docs = self.update_doclist(result_docs, temp_terms)
         else:
+          #prefix+suffix query
           pref_terms = []
           suff_terms = []
           star_index=term.index('*')
           prefix_term=term[:star_index]
           suffix_term=term[star_index+1:]
 
-          node = self.tree.search(prefix_term)
-          while node and node.val < prefix_term[:-1]+chr(ord(prefix_term[-1])+1):
-            pref_terms.append(node.val)
-            node=bstree.inOrderSuccessor(self.tree, node)
+          pref_terms = self.get_words_from_tree(self.tree, prefix_term)
+
           suffix_term = suffix_term[::-1]
-          node=self.reverse_tree.search(suffix_term)
-          while node and node.val < suffix_term[:-1]+chr(ord(suffix_term[-1])+1):
-            suff_terms.append(node.val[::-1])
-            node=bstree.inOrderSuccessor(self.reverse_tree, node)  
-          if len(result_docs)==0:
-            result_docs.update(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
-          else:
-            result_docs=result_docs.intersection(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
+          suff_terms = [i[::-1] for i in self.get_words_from_tree(self.reverse_tree, suffix_term)]
+          result_docs = self.update_doclist(result_docs, self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
+
       else:
           new_query_terms.append(term)
+
     query_terms=new_query_terms
     query_terms.sort(key=lambda x: len(self.index[x]))
+
     if star_flag==1:
       if(len(query_terms)!=0):
         result_docs=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))).intersection(result_docs)
