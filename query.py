@@ -3,33 +3,42 @@ from collections import defaultdict
 from config import config_params
 import indexes as index
 import json
-
+from utils.timer import timer_decorator
+import os
 
 def preprocess_query(query):
   query = query.strip()
   channel = None
   show = None
+  filters = {}
 
   if '`' in query:
     #extract the field
     bt1 = query.index('`')
     bt2 = query.index('`', query.index('`')+1)
 
-    channel = query[bt1+1:bt2]
+    filters['channel'] = query[bt1+1:bt2]
 
-    if '/' in channel:
-      channel, show = channel.split('/')
+    if '/' in filters['channel']:
+      filters['channel'], filters['show'] = filters['channel'].split('/')
+    if ':' in filters['channel']:
+      filters['document'], filters['channel']= filters['channel'].split(':')
 
     #strip the channel condition from the query
     query = query[bt2+1:]
-  return query, channel, show
 
-def postprocess_query(docs,scores, channel, show):
+  return query, filters
+
+def postprocess_query(docs,scores, filters):
   result = []
   score=[]
+  if len(filters)==0:
+    return docs, scores
   #postprocess the docs and maintain only the ones with the given show/channel
   for i in range(len(docs)):
-    if (not channel or data_dict['rowdict'][docs[i]][2] == channel) and (not show or data_dict['rowdict'][docs[i]][3] == show):
+    if ('channel' not in filters or len(filters['channel'])==0 or data_dict['rowdict'][docs[i]][2] == filters['channel']) and \
+      ('show' not in filters or len(filters['show'])==0 or data_dict['rowdict'][docs[i]][3] == filters['show']) and \
+      ('document' not in filters or len(filters['document'])==0 or data_dict['rowdict'][docs[i]][1].split(os.path.sep)[1][:-4] == filters['document']):
       result.append(docs[i])
       if(config_params['index']==1):
         score.append(scores[i])
@@ -44,16 +53,21 @@ if config_params["index"] == 1:
 elif config_params["index"] == 2:
   index=index.BooleanQuery(data_dict['rowterms'])
 
-query = "`bbcnews` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+query = "`BBCNEWS.201701:bbcnews` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
 #query="scientific community"
-query, channel, show = preprocess_query(query)
-docs = index.query(query)
-if config_params['index']==1:
-  scores=[i[1] for i in docs]
-  docs=[i[0] for i in docs]
-else:
-  scores=[]
-docs,scores = postprocess_query(docs,scores, channel, show)
+
+@timer_decorator
+def perform_query(query):
+  query, filters = preprocess_query(query)
+  docs = index.query(query)
+  if config_params['index']==1:
+    scores=[i[1] for i in docs]
+    docs=[i[0] for i in docs]
+  else:
+    scores=[]
+  return postprocess_query(docs, scores, filters)
+
+docs, scores = perform_query(query)
 
 json_res={}
 if config_params['index']==1:

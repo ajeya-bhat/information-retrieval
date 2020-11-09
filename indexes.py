@@ -6,9 +6,9 @@ from functools import reduce
 from nltk.corpus import words
 from nltk.metrics import edit_distance
 import pickle
-from bstree import BSTNode
-import bstree
-import colorize
+from utils import bstree
+from utils.bstree import BSTNode
+from utils import colorize
 
 with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
