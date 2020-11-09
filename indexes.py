@@ -178,7 +178,7 @@ class BooleanQuery(Index):
 
           suffix_term = suffix_term[::-1]
           suff_terms = [i[::-1] for i in self.get_words_from_tree(self.reverse_tree, suffix_term)]
-          result_docs = self.update_doclist(result_docs, self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
+          result_docs = self.update_doclist(result_docs, list(set(pref_terms).intersection(set(suff_terms))))
 
       else:
           new_query_terms.append(term)
