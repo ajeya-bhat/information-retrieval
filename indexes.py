@@ -8,6 +8,7 @@ from nltk.metrics import edit_distance
 import pickle
 from bstree import BSTNode
 import bstree
+import colorize
 
 with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
@@ -21,12 +22,12 @@ class Index:
 
       for word in split_query:
         if word not in words_list and '*' not in word:
-          print(word, "is not in dict")
+          print(colorize.magenta("%s is not in dict"%word))
           #process
           words_distance = zip(words_list, map(lambda x : edit_distance(word, x), words_list))
           best_word = reduce(lambda x,y : x if x[1]<=y[1] else y, words_distance)[0]
           word = best_word
-          print("replaced with", word)
+          print(colorize.green("replaced with %s"%word))
         result.append(word)
       query = result
     return " ".join(query)
