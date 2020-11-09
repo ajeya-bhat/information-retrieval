@@ -6,9 +6,9 @@ from functools import reduce
 from nltk.corpus import words
 from nltk.metrics import edit_distance
 import pickle
-from bstree import BSTNode
-import bstree
-import colorize
+from utils import bstree
+from utils.bstree import BSTNode
+from utils import colorize
 
 with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
@@ -175,10 +175,9 @@ class BooleanQuery(Index):
           suffix_term=term[star_index+1:]
 
           pref_terms = self.get_words_from_tree(self.tree, prefix_term)
-
           suffix_term = suffix_term[::-1]
           suff_terms = [i[::-1] for i in self.get_words_from_tree(self.reverse_tree, suffix_term)]
-          result_docs = self.update_doclist(result_docs, self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
+          result_docs = self.update_doclist(result_docs, list(set(pref_terms).intersection(set(suff_terms))))
 
       else:
           new_query_terms.append(term)
