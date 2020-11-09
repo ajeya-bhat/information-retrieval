@@ -145,7 +145,8 @@ class BooleanQuery(Index):
 
             result_docs.update(self.query_or(temp_terms))
           else:
-            reslut_docs=result_docs.intersection(self.query_or(temp_terms))
+            result_docs=result_docs.intersection(self.query_or(temp_terms))
+
         elif term[0]=='*':
           term=term[1:][::-1]
           temp_terms = []
@@ -163,6 +164,7 @@ class BooleanQuery(Index):
           star_index=term.index('*')
           prefix_term=term[:star_index]
           suffix_term=term[star_index+1:]
+
           node = self.tree.search(prefix_term)
           while node and node.val < prefix_term[:-1]+chr(ord(prefix_term[-1])+1):
             pref_terms.append(node.val)
@@ -171,7 +173,7 @@ class BooleanQuery(Index):
           node=self.reverse_tree.search(suffix_term)
           while node and node.val < suffix_term[:-1]+chr(ord(suffix_term[-1])+1):
             suff_terms.append(node.val[::-1])
-            node=bstree.inOrderSuccessor(self.reverse_tree, node)          
+            node=bstree.inOrderSuccessor(self.reverse_tree, node)  
           if len(result_docs)==0:
             result_docs.update(self.query_or(list(set(pref_terms).intersection(set(suff_terms)))))
           else:

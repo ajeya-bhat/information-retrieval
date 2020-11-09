@@ -43,7 +43,7 @@ elif config_params["index"] == 2:
   index=index.BooleanQuery(data_dict['rowterms'])
 
 #query = "brazil's *nment is defending its plan to build dozens of huge hydro-electric dams"
-query="scien* communit*"
+query="scientif*c communit*"
 query, channel, show = preprocess_query(query)
 docs = index.query(query)
 docs = postprocess_query(docs, channel, show)
