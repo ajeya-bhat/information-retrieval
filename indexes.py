@@ -186,7 +186,6 @@ class BooleanQuery(Index):
       if(len(query_terms)!=0):
         result_docs=set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))).intersection(result_docs)
       return list(result_docs)
-    
     if(len(query_terms)==0):
       return list()
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
