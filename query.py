@@ -5,6 +5,8 @@ import indexes as index
 import json
 from utils.timer import timer_decorator
 import os
+import datetime
+import pandas as pd
 
 def preprocess_query(query):
   query = query.strip()
@@ -111,6 +113,7 @@ def main():
       resdict['score']=scores[j]
     json_res['hits'].append(resdict)
   print(json.dumps(json_res,indent=1))
+  return json_res
 
 
 if __name__ == "__main__":
@@ -124,6 +127,24 @@ if __name__ == "__main__":
   elif config_params["index"] == 2:
     index=index.BooleanQuery(data_dict['rowterms'])
 
-  query = "`BBCNEWS.201701:bbcnews` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+  query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+  #query = input()
   #query="scientific community"
-  main()
+  doclist =main()
+  if config_params["index"] == 1:
+    if "prev_queries.csv" in os.listdir("data"):
+      df = pd.read_csv(os.path.join("data", "prev_queries.csv"), index_col=False)
+    else:
+      df = pd.DataFrame(columns = ["Query", "Time", "station", "show", "document", "rowid", "row_snippet"])
+    df = df.append({
+      "Query":query,
+      "Time":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
+      "station": doclist['hits'][0]["station"],
+      "show":doclist['hits'][0]['show'],
+      "document": doclist['hits'][0]["document_name"],
+      "rowid" : doclist['hits'][0]['snippet'],
+      "row_snippet" : doclist['hits'][0]['id']
+    }, ignore_index = True)
+    print(df)
+    df.to_csv(os.path.join("data", "prev_queries.csv"), index = None)
+
