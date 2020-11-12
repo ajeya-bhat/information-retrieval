@@ -196,3 +196,23 @@ class BooleanQuery(Index):
       return list()
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
 
+class PosIndex(Index):
+  index = defaultdict(lambda : defaultdict(set))
+  ndocs = 0
+
+  def __init__(self, corpus_dictionary):
+
+    self.ndocs = len(corpus_dictionary)
+
+    for doc in corpus_dictionary:
+        position=0
+        for term in corpus_dictionary[doc]:
+          self.index[term][doc].add(position)
+          position+=1
+        
+  def pos_index_query(self,query_string):
+    query_string = self.process_spell_errors(query_string)
+    query_terms = preprocess_sentence(query_string)
+
+    query_terms.sort(key=lambda x: len(self.index[x]))
+    return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))) 

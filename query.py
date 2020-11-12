@@ -66,6 +66,9 @@ def main():
     json_res['index']="vector space model(tf idf)"
   elif config_params['index']==2:
     json_res['index']="boolean query"
+  elif config_params['index']==3:
+    json_res['index']="positional index"
+  
 
   if config_params['stopword_removal']==1:
     json_res['stopword_removal']=True
@@ -126,6 +129,8 @@ if __name__ == "__main__":
     index = index.TFIDFIndex(data_dict['rowterms'])
   elif config_params["index"] == 2:
     index=index.BooleanQuery(data_dict['rowterms'])
+  elif config_params['index'] == 3:
+    index=index.PosIndex(data_dict['rowterms'])
 
   query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
   #query = input()
