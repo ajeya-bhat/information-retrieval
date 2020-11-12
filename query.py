@@ -120,7 +120,6 @@ def main():
 
 
 if __name__ == "__main__":
-  
   #load the processed pickle file
   with open("data/data.pkl", "rb") as f:
     data_dict = pickle.load(f)
@@ -130,9 +129,10 @@ if __name__ == "__main__":
   elif config_params["index"] == 2:
     index=index.BooleanQuery(data_dict['rowterms'])
   elif config_params['index'] == 3:
-    index=index.PosIndex(data_dict['rowterms'])
+    index=index.PositionalIndex(data_dict['rowterms'])
 
   query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+  #query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge"
   #query = input()
   #query="scientific community"
   doclist =main()

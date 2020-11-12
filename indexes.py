@@ -6,6 +6,7 @@ from functools import reduce
 from nltk.corpus import words
 from nltk.metrics import edit_distance
 import pickle
+import copy
 from utils import bstree
 from utils.bstree import BSTNode
 from utils import colorize
@@ -196,25 +197,46 @@ class BooleanQuery(Index):
       return list()
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
 
-class PosIndex(Index):
-  index = defaultdict(lambda : defaultdict(set))
-  ndocs = 0
+class PositionalIndex(Index):
 
   def __init__(self, corpus_dictionary):
-
     self.ndocs = len(corpus_dictionary)
-
+    self.index = defaultdict(lambda : defaultdict(set))
     for doc in corpus_dictionary:
         position=0
         for term in corpus_dictionary[doc]:
-          #print(self.index[term][doc])
           self.index[term][doc].add(position)
-          #print(self.index[term][doc])
           position+=1
-  print(index['climat'][2673])
-  def pos_index_query(self,query_string):
+
+  def query(self,query_string):
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
+    query_docs = []
+    for i in range(len(query_terms)):
+      newdocdict = copy.deepcopy(self.index[query_terms[i]])
+      for doc in newdocdict:
+        #doc is an id with value = list
+        newdocdict[doc] = set(map(lambda x: x-i, newdocdict[doc]))
+      query_docs.append(newdocdict)
 
-    query_terms.sort(key=lambda x: len(self.index[x]))
-    return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms)))) 
+    #query docs is a list of dictionaries, where each dict correpsonds to the posting list of 1 query term
+    answer = []
+    for doc in query_docs[0]:
+      #do something
+      docflag = True
+      for position in query_docs[0][doc]:
+        posflag = True
+        for other_doclist in query_docs[1:]:
+          if doc not in other_doclist:
+            docflag = False
+            break
+          if position not in other_doclist[doc]:
+            posflag = False
+            break
+
+        if docflag and posflag:
+          answer.append(doc)
+          break
+        if not docflag:
+          break
+    return answer

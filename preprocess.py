@@ -46,9 +46,9 @@ def preprocess_sentence(w):
   if "*" not in w:
     tokenized_list = nltk.word_tokenize(w)
     for i in tokenized_list:
-      if config_params['preprocess_type']==1 and config_params['index']!=2:
+      if config_params['preprocess_type']==1 and config_params['index']==1:
           i=ps.stem(i)
-      elif config_params['preprocess_type']==2 and config_params['index']!=2:
+      elif config_params['preprocess_type']==2 and config_params['index']==1:
         i=lemmatizer.lemmatize(i)
       if config_params["stopword_removal"]==1 and i in  stopword_set:
         continue
@@ -60,9 +60,9 @@ def preprocess_sentence(w):
       if '*' in i:
         preprocessed_sent.append(i)
         continue
-      elif config_params['preprocess_type']==1 and config_params['index']!=2:
+      elif config_params['preprocess_type']==1 and config_params['index']==1:
         i=ps.stem(i)
-      elif config_params['preprocess_type']==2 and config_params['index']!=2:
+      elif config_params['preprocess_type']==2 and config_params['index']==1:
         i=lemmatizer.lemmatize(i)
       if config_params["stopword_removal"]==1 and i in  stopword_set:
         continue
