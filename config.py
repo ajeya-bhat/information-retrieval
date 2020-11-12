@@ -1,7 +1,7 @@
 config_params={
-  'preprocess_type': 1,
+  'preprocess_type': 3,
   "stopword_removal" : 1,
-  "index" : 3,
+  "index" : 1,
   "tf_scheme" : 1,
   "spell_check" : 1
 }

@@ -2,9 +2,9 @@ import time
 from utils import colorize
 
 def timer_decorator(fn):
-    def wrapper(param):
+    def wrapper(*param):
         start_ns = time.time()
-        res = fn(param)
+        res = fn(*param)
         end_ns = time.time()
 
         print(

@@ -8,11 +8,23 @@ import os
 import datetime
 import pandas as pd
 
+with open("data/data.pkl", "rb") as f:
+    data_dict = pickle.load(f)
+
 def preprocess_query(query):
   query = query.strip()
   channel = None
   show = None
   filters = {}
+
+  if '<' in query:
+    #extract doc
+    bt1 = query.index('<')
+    bt2 = query.index('>')
+    filters['document'] = query[bt1+1:bt2]
+    query = query[bt2+1:]
+  else:
+    filters['document'] = None
 
   if '`' in query:
     #extract the field
@@ -23,12 +35,9 @@ def preprocess_query(query):
 
     if '/' in filters['channel']:
       filters['channel'], filters['show'] = filters['channel'].split('/')
-    if ':' in filters['channel']:
-      filters['document'], filters['channel']= filters['channel'].split(':')
 
     #strip the channel condition from the query
     query = query[bt2+1:]
-
   return query, filters
 
 def postprocess_query(docs,scores, filters):
@@ -39,27 +48,50 @@ def postprocess_query(docs,scores, filters):
   #postprocess the docs and maintain only the ones with the given show/channel
   for i in range(len(docs)):
     if ('channel' not in filters or len(filters['channel'])==0 or data_dict['rowdict'][docs[i]][2] == filters['channel']) and \
-      ('show' not in filters or len(filters['show'])==0 or data_dict['rowdict'][docs[i]][3] == filters['show']) and \
-      ('document' not in filters or len(filters['document'])==0 or data_dict['rowdict'][docs[i]][1].split(os.path.sep)[1][:-4] == filters['document']):
+      ('show' not in filters or len(filters['show'])==0 or data_dict['rowdict'][docs[i]][3] == filters['show']) :
       result.append(docs[i])
       if(config_params['index']==1):
         score.append(scores[i])
   return result,scores
 
 
-@timer_decorator
-def perform_query(query):
+def prepare_query(query):
+  global index
+  #load the processed pickle file
+  with open("data/data.pkl", "rb") as f:
+    data_dict = pickle.load(f)
+
+  new_rowterm_dict={}
   query, filters = preprocess_query(query)
+  if filters['document'] is not None:    
+    for j in data_dict['rowterms']:
+      if data_dict['rowdict'][j][1].split(os.path.sep)[1][:-4] == filters['document']:
+        new_rowterm_dict[j]=data_dict['rowterms'][j]
+  else:
+    new_rowterm_dict=data_dict['rowterms']
+  if config_params["index"] == 1:
+    index = index.TFIDFIndex(new_rowterm_dict)
+  elif config_params["index"] == 2:
+    index=index.BooleanQuery(new_rowterm_dict)
+  elif config_params['index'] == 3:
+    index =index.PositionalIndex(new_rowterm_dict)
+
+  return perform_query(new_rowterm_dict,query, filters)
+
+@timer_decorator
+def perform_query(new_rowterm_dict,query, filters):
+
   docs = index.query(query)
   if config_params['index']==1:
     scores=[i[1] for i in docs]
     docs=[i[0] for i in docs]
   else:
     scores=[]
-  return postprocess_query(docs, scores, filters)
+  docs, scores = postprocess_query(docs, scores, filters)
+  return new_rowterm_dict, docs, scores
 
 def main():
-  docs, scores = perform_query(query)
+  d_dict, docs, scores = prepare_query(query)
 
   json_res={}
   if config_params['index']==1:
@@ -95,14 +127,14 @@ def main():
 
 
   if len(docs)>100:
-    json_res['number_of_hits']='100+'
+    json_res['number_of_hits']='20+'
   else:
     json_res['number_of_hits']=len(docs)
 
-  if(len(docs)>100):
-    docs=docs[:100]
+  if(len(docs)>20):
+    docs=docs[:20]
     if config_params['index']==1:
-      scores=scores[:100]
+      scores=scores[:20]
 
   json_res['hits']=[]
   for j in range(len(docs)):
@@ -120,22 +152,12 @@ def main():
 
 
 if __name__ == "__main__":
-  #load the processed pickle file
-  with open("data/data.pkl", "rb") as f:
-    data_dict = pickle.load(f)
-
-  if config_params["index"] == 1:
-    index = index.TFIDFIndex(data_dict['rowterms'])
-  elif config_params["index"] == 2:
-    index=index.BooleanQuery(data_dict['rowterms'])
-  elif config_params['index'] == 3:
-    index=index.PositionalIndex(data_dict['rowterms'])
-
-  query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+  query = "`bbcnews` brazil's government was defending its plan to build dozens of huge hydro-electric dams"
   #query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge"
   #query = input()
   #query="scientific community"
-  doclist =main()
+
+  doclist = main()
   if config_params["index"] == 1:
     if "prev_queries.csv" in os.listdir("data"):
       df = pd.read_csv(os.path.join("data", "prev_queries.csv"), index_col=False)

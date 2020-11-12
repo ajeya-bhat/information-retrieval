@@ -72,7 +72,7 @@ def preprocess_sentence(w):
     #root form reductions based on condition
   return preprocessed_sent
 
-if __name__ == "__main__":
+def get_snippets():
   #read the data
   #mapping from uuid to row, doc pair
   rowdict = {}
@@ -105,3 +105,5 @@ if __name__ == "__main__":
   with open("data/data.pkl", "wb") as f:
     pickle.dump({"rowsnip" : rowsnip, "rowterms":rowterms, "rowdict" : rowdict, "word_corpus" : word_corpus}, f)
 
+if __name__ == "__main__":
+  get_snippets()
