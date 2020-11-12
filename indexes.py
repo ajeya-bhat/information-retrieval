@@ -207,9 +207,11 @@ class PosIndex(Index):
     for doc in corpus_dictionary:
         position=0
         for term in corpus_dictionary[doc]:
+          #print(self.index[term][doc])
           self.index[term][doc].add(position)
+          #print(self.index[term][doc])
           position+=1
-        
+  print(index['climat'][2673])
   def pos_index_query(self,query_string):
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
