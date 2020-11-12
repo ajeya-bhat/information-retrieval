@@ -146,6 +146,7 @@ def main():
     resdict['snippet']=data_dict['rowsnip'][docs[j]]
     if config_params['index']==1:
       resdict['score']=scores[j]
+      
     json_res['hits'].append(resdict)
   print(json.dumps(json_res,indent=1))
   return json_res
