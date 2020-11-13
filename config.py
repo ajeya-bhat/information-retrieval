@@ -3,6 +3,7 @@ config_params={
   "stopword_removal" : 1,
   "index" : 1,
   "tf_scheme" : 1,
+  "threshold_score" : 0,
   "spell_check" : 1,
   "es_index" : "perf_test",
   "result_size" : 20,

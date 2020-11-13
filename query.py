@@ -1,12 +1,14 @@
 import pickle
 from collections import defaultdict
 from config import config_params
-import indexes as index
+import indexes
 import json
 from utils.timer import timer_decorator
 import os
 import datetime
 import pandas as pd
+
+ind = None
 
 with open(os.path.join('data', 'data.pkl'), "rb") as f:
     data_dict = pickle.load(f)
@@ -56,7 +58,7 @@ def postprocess_query(docs,scores, filters):
 
 
 def prepare_query(query):
-  global index
+  global ind
   #load the processed pickle file
   with open(os.path.join("data", "data.pkl"), "rb") as f:
     data_dict = pickle.load(f)
@@ -69,19 +71,21 @@ def prepare_query(query):
         new_rowterm_dict[j]=data_dict['rowterms'][j]
   else:
     new_rowterm_dict=data_dict['rowterms']
-  if config_params["index"] == 1:
-    index = index.TFIDFIndex(new_rowterm_dict)
-  elif config_params["index"] == 2:
-    index=index.BooleanQuery(new_rowterm_dict)
-  elif config_params['index'] == 3:
-    index =index.PositionalIndex(new_rowterm_dict)
+
+  if ind is None:
+    if config_params["index"] == 1:
+      ind = indexes.TFIDFIndex(new_rowterm_dict)
+    elif config_params["index"] == 2:
+      ind=indexes.BooleanQuery(new_rowterm_dict)
+    elif config_params['index'] == 3:
+      ind =indexes.PositionalIndex(new_rowterm_dict)
 
   return perform_query(new_rowterm_dict,query, filters)
 
 @timer_decorator
 def perform_query(new_rowterm_dict,query, filters):
 
-  docs = index.query(query)
+  docs = ind.query(query)
   if config_params['index']==1:
     scores=[i[1] for i in docs]
     docs=[i[0] for i in docs]

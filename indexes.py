@@ -97,9 +97,11 @@ class TFIDFIndex(Index):
         cosine_similarity[doc] = dotproducts[doc] / (query_magnitude * sqrt(magnitude[doc]) + 1e-10)
 
     ranked_docs = list(cosine_similarity.items())
-
     ranked_docs = sorted(ranked_docs, key = lambda x : x[1], reverse = True)
-    return ranked_docs
+    threshold_docs = list(filter(lambda x : x[1]>config_params["threshold_score"], ranked_docs))
+    #return docs with score>threshold, or the top 10% docs
+    print(len(ranked_docs))
+    return threshold_docs if len(threshold_docs) else ranked_docs[:len(ranked_docs)//10 + 1]
 
 class BooleanQuery(Index):
   index = defaultdict(set) #index[term][docid] = tf(doc, term)

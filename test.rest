@@ -1,0 +1,7 @@
+POST http://localhost:5000/search HTTP/1.1 
+Content-Type: application/json
+
+{
+"engine" : 1,
+"query":"brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+}
