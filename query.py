@@ -90,7 +90,7 @@ def perform_query(new_rowterm_dict,query, filters):
   docs, scores = postprocess_query(docs, scores, filters)
   return new_rowterm_dict, docs, scores
 
-def main():
+def main(query):
   d_dict, docs, scores = prepare_query(query)
 
   json_res={}
@@ -146,9 +146,7 @@ def main():
     resdict['snippet']=data_dict['rowsnip'][docs[j]]
     if config_params['index']==1:
       resdict['score']=scores[j]
-      
     json_res['hits'].append(resdict)
-  print(json.dumps(json_res,indent=1))
   return json_res
 
 
@@ -158,7 +156,8 @@ if __name__ == "__main__":
   #query = input()
   #query="scientific community"
 
-  doclist = main()
+  doclist = main(query)
+  print(json.dumps(doclist,indent=1))
   if config_params["index"] == 1:
     if "prev_queries.csv" in os.listdir("data"):
       df = pd.read_csv(os.path.join("data", "prev_queries.csv"), index_col=False)
@@ -173,6 +172,5 @@ if __name__ == "__main__":
       "rowid" : doclist['hits'][0]['snippet'],
       "row_snippet" : doclist['hits'][0]['id']
     }, ignore_index = True)
-    print(df)
     df.to_csv(os.path.join("data", "prev_queries.csv"), index = None)
 
