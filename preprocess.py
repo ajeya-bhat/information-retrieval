@@ -102,7 +102,7 @@ def get_snippets():
     rowterms[doc] = preprocess_sentence(rowsnip[doc])
 
   #write the preprocessed document pickle files.
-  with open("data/data.pkl", "wb") as f:
+  with open(os.path.join('data', "data.pkl"), "wb") as f:
     pickle.dump({"rowsnip" : rowsnip, "rowterms":rowterms, "rowdict" : rowdict, "word_corpus" : word_corpus}, f)
 
 if __name__ == "__main__":
