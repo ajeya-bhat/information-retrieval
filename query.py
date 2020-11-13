@@ -8,7 +8,7 @@ import os
 import datetime
 import pandas as pd
 
-with open("data/data.pkl", "rb") as f:
+with open(os.path.join('data', 'data.pkl'), "rb") as f:
     data_dict = pickle.load(f)
 
 def preprocess_query(query):
@@ -58,7 +58,7 @@ def postprocess_query(docs,scores, filters):
 def prepare_query(query):
   global index
   #load the processed pickle file
-  with open("data/data.pkl", "rb") as f:
+  with open(os.path.join("data", "data.pkl"), "rb") as f:
     data_dict = pickle.load(f)
 
   new_rowterm_dict={}
