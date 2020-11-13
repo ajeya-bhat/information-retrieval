@@ -131,10 +131,10 @@ def main(query):
   else:
     json_res['number_of_hits']=len(docs)
 
-  if(len(docs)>20):
-    docs=docs[:20]
+  if(len(docs)>config_params['result_size']):
+    docs=docs[:config_params['result_size']]
     if config_params['index']==1:
-      scores=scores[:20]
+      scores=scores[:config_params['result_size']]
 
   json_res['hits']=[]
   for j in range(len(docs)):

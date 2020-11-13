@@ -7,8 +7,9 @@ import sys
 from pprint import pprint
 import os
 
-sys.path.append("../")
+sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.timer import timer_decorator
+from config import config_params
 
 # make sure ES is up and running
 # res = requests.get('http://localhost:9200')
@@ -25,7 +26,6 @@ def generate_actions(path):
         # print(csv)
         with open(file, mode = "r") as f:
             reader = csv.DictReader(f)
-            id = 1
             for row in reader:
                 doc = {
                      "id" : uid,
@@ -39,7 +39,6 @@ def generate_actions(path):
                      "Snippet" : row["Snippet"]
                 }
                 uid += 1
-                id += 1
                 yield doc
         print(_csv)
 
@@ -59,26 +58,42 @@ def delete_index(es, index):
     except Exception as error:
         print("indices.delete.error", error)
 
-def cat_indices(es):
+def cat_indices():
     """ lists ES indices """
     indices = es.indices.get_alias().keys()
-    print(sorted(indices))
+    return list(sorted(indices))
 
 @timer_decorator
-def search(es, index_name, search):
-    res = es.search(index=index_name, body=search)
-    print(json.dumps(res, indent = 3))
+def search(search):
+    res = es.search(index=config_params['es_index'], body=search)
+    return res
+
+def search_snippet(query):
+    search_object = {
+        "size" : config_params["result_size"],
+        "query": {
+            "multi_match": {
+                "query" : query,
+                "fields" : ["Snippet"]
+            }
+        }
+    }
+    res = search(json.dumps(search_object))
+    return res
+
+
+
+es = Elasticsearch([{'host': config_params['es_host'], 'port': config_params['es_port']}])
+
 
 if __name__ == '__main__':
     # connect to our cluster
-    es = Elasticsearch([{'host': 'localhost', 'port': 9200}])
     if es is not None:
             # print(help(build_index))
-            path = "../TelevisionNews/"
-            index = "test1"
-
-            # build_index(es, index, path)
-            cat_indices(es)
+            path = "TelevisionNews/"
+            index = config_params["es_index"]
+            if config_params["es_index"] not in cat_indices():
+                build_index(es, index, path)
 
             # TODO - need to add types of queries
             # search_object = {"size": 10000, query": {"match_all": {}}}
@@ -91,5 +106,6 @@ if __name__ == '__main__':
                     }
                 }
             }
-            search(es, index, json.dumps(search_object))
+            res = search(es, index, json.dumps(search_object))
+            print(json.dumps(res, indent = 3))
             # delete_index(es, index)
