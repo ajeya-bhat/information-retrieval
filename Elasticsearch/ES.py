@@ -7,6 +7,9 @@ import sys
 from pprint import pprint
 import os
 
+sys.path.append("../")
+from utils.timer import timer_decorator
+
 # make sure ES is up and running
 # res = requests.get('http://localhost:9200')
 # print(res.content)
@@ -16,6 +19,7 @@ def generate_actions(path):
     Reads csv through csv.DictReader() and yields a single document for each record.
     This function is passed into the bulk() helper to create many documents in sequence.
     """
+    uid = 0
     for _csv in sorted(os.listdir(path)):
         file = os.path.join(path, _csv)
         # print(csv)
@@ -24,16 +28,17 @@ def generate_actions(path):
             id = 1
             for row in reader:
                 doc = {
-                     "id" : id,
-                     "doc_name" : _csv,
-                     "URL" : row["\ufeffURL"],
-                     "MatchDateTime" : row["MatchDateTime"],
+                     "id" : uid,
+                     "document_name" : _csv,
+                     # "URL" : row["\ufeffURL"],
+                     # "MatchDateTime" : row["MatchDateTime"],
                      "Station" : row["Station"],
                      "Show" : row["Show"],
-                     "IAShowID" : row["IAShowID"],
-                     "IAPreviewThumb" : row["IAPreviewThumb"],
+                     # "IAShowID" : row["IAShowID"],
+                     # "IAPreviewThumb" : row["IAPreviewThumb"],
                      "Snippet" : row["Snippet"]
                 }
+                uid += 1
                 id += 1
                 yield doc
         print(_csv)
@@ -59,6 +64,7 @@ def cat_indices(es):
     indices = es.indices.get_alias().keys()
     print(sorted(indices))
 
+@timer_decorator
 def search(es, index_name, search):
     res = es.search(index=index_name, body=search)
     print(json.dumps(res, indent = 3))
@@ -69,15 +75,15 @@ if __name__ == '__main__':
     if es is not None:
             # print(help(build_index))
             path = "../TelevisionNews/"
-            index = "test"
+            index = "test1"
 
-            build_index(es, index, path)
+            # build_index(es, index, path)
             cat_indices(es)
 
             # TODO - need to add types of queries
             # search_object = {"size": 10000, query": {"match_all": {}}}
             search_object = {
-                "size" : 10,
+                "size" : 20,
                 "query": {
                     "multi_match": {
                         "query" : "brazil's government is defending its plan to build dozens of huge hydro-electric dams",

@@ -38,7 +38,7 @@ def preprocess_sentence(w):
   w=w.replace('.','')
   w=w.replace(',','')
   w=w.replace('!','')
-  
+
   # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
   w = re.sub(r"[^a-zA-Z?.!,¿*]+", " ", w)
   preprocessed_sent  = []
@@ -67,8 +67,8 @@ def preprocess_sentence(w):
       if config_params["stopword_removal"]==1 and i in  stopword_set:
         continue
       preprocessed_sent.append(i)
-  
-  
+
+
     #root form reductions based on condition
   return preprocessed_sent
 
@@ -78,7 +78,7 @@ def get_snippets():
   rowdict = {}
   #a dictionary that maps docid to its snippet
   rowsnip = {}
-  #a dictionary that maps a row to its term list 
+  #a dictionary that maps a row to its term list
   rowterms = {}
   word_corpus = set()
 

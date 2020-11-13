@@ -63,7 +63,7 @@ def prepare_query(query):
 
   new_rowterm_dict={}
   query, filters = preprocess_query(query)
-  if filters['document'] is not None:    
+  if filters['document'] is not None:
     for j in data_dict['rowterms']:
       if data_dict['rowdict'][j][1].split(os.path.sep)[1][:-4] == filters['document']:
         new_rowterm_dict[j]=data_dict['rowterms'][j]
@@ -100,7 +100,7 @@ def main():
     json_res['index']="boolean query"
   elif config_params['index']==3:
     json_res['index']="positional index"
-  
+
 
   if config_params['stopword_removal']==1:
     json_res['stopword_removal']=True
@@ -146,15 +146,16 @@ def main():
     resdict['snippet']=data_dict['rowsnip'][docs[j]]
     if config_params['index']==1:
       resdict['score']=scores[j]
-      
+
     json_res['hits'].append(resdict)
   print(json.dumps(json_res,indent=1))
   return json_res
 
 
 if __name__ == "__main__":
-  query = "`bbcnews` brazil's government was defending its plan to build dozens of huge hydro-electric dams"
-  #query = "`BBCNEWS.201701:` brazil's government is defending its plan to build dozens of huge"
+  # query = "`bbcnews` brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+  query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+  # query = "<BBCNEWS.201701> brazil's government is defending its plan to build dozens of huge"
   #query = input()
   #query="scientific community"
 
@@ -173,6 +174,5 @@ if __name__ == "__main__":
       "rowid" : doclist['hits'][0]['snippet'],
       "row_snippet" : doclist['hits'][0]['id']
     }, ignore_index = True)
-    print(df)
+    # print(df)
     df.to_csv(os.path.join("data", "prev_queries.csv"), index = None)
-
