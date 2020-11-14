@@ -20,16 +20,13 @@ def compare_scores(snippets):
         # query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
         print(query, end = ' ')
         scores = metrics.metrics(query)
-        precision = scores[0] / (scores[0] + scores[1])
-        recall = scores[0] / (scores[0] + scores[2])
-        if(precision or recall):
-            F1 = 2*precision*recall/(precision + recall)
-            if(F1 >= 0.4):
-                scores_dict[query] = F1
-        else:
-            F1 = 0
+        precision = scores[0] / (scores[0] + scores[1] + 1e-9)
+        recall = scores[0] / (scores[0] + scores[2] + 1e-9)
+        F1 = 2*precision*recall/(precision + recall + 1e-9)
+        if(F1 >= 0.4):
+            scores_dict[query] = F1
         print('F1-score', F1)
-        return scores_dict
+    return scores_dict
 
 def compare(snippets):
     try:
