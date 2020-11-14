@@ -171,10 +171,10 @@ if __name__ == "__main__":
     df = df.append({
       "Query":query,
       "Time":datetime.datetime.now().strftime("%I:%M%p on %B %d, %Y"),
-      "station": doclist['hits'][0]["station"],
-      "show":doclist['hits'][0]['show'],
-      "document": doclist['hits'][0]["document_name"],
-      "rowid" : doclist['hits'][0]['snippet'],
-      "row_snippet" : doclist['hits'][0]['id']
+      "station": doclist['hits'][0]["_source"]["Station"],
+      "show":doclist['hits'][0]["_source"]['Show'],
+      "document": doclist['hits'][0]["_source"]["document_name"],
+      "rowid" : doclist['hits'][0]["_source"]['Snippet'],
+      "row_snippet" : doclist['hits'][0]["_source"]['id']
     }, ignore_index = True)
     df.to_csv(os.path.join("data", "prev_queries.csv"), index = None)

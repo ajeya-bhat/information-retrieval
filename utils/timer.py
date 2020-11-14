@@ -8,7 +8,7 @@ def timer_decorator(fn):
         end_ns = time.time()
 
         print(
-            colorize.blue("Time Taken to run %s : %.4f"%(fn.__name__, end_ns-start_ns))
+            colorize.blue("Time taken to run %s : %.4f s"%(fn.__name__, end_ns-start_ns))
             )
         return res
     return wrapper
