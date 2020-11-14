@@ -148,6 +148,24 @@ class BooleanQuery(Index):
     return ans
 
   def query(self, query_string):
+    not_queries=[]
+    good_queries=[]
+    if 'OR' in query_string:
+      queries=query_string.split('OR')
+    else:
+      queries=[query_string]
+    for query in queries:
+
+      if 'NOT' in query:
+        not_queries.extend(self.break_query(query))
+      else:
+        good_queries.extend(self.break_query(query))
+    good_queries=set(good_queries)
+    not_queries=set(not_queries)
+    good_queries=good_queries.difference(not_queries)
+    return list(good_queries) 
+
+  def break_query(self, query_string):
     star_flag=0
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
