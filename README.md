@@ -7,7 +7,7 @@ A search engine written in python. Uses [this](https://www.kaggle.com/amritvirsi
 ---
 
 0. Install all the required dependencies.
-   
+
     ```pip install -r requirements.txt```
 1. Make the required changes to `config.py`. Please refer to the comments in that file for options.
 2. Run `preprocess.py`. This will generate a pickle file in `data/data.pkl`, which will be sued by the subsequent files.

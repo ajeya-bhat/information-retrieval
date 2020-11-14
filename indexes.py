@@ -16,7 +16,7 @@ with open("data/data.pkl", "rb") as f:
 
 class Index:
   def process_spell_errors(self, query):
-    if config_params["spell_check"]:
+    if config_params['spell_check']:
       split_query = query.split()
       result = []
       words_list = set(words.words()).union(data_dict['word_corpus'])
@@ -31,7 +31,8 @@ class Index:
           print(colorize.green("replaced with %s"%word))
         result.append(word)
       query = result
-    return " ".join(query)
+      return " ".join(query)
+    return query
 
   def query(self, q):
     pass

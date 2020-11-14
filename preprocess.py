@@ -84,7 +84,7 @@ def get_snippets():
 
   docid = 0
 
-  for i in os.listdir('TelevisionNews'):
+  for i in sorted(os.listdir('TelevisionNews')):
     try:
       df =  pd.read_csv(os.path.join('TelevisionNews', i))
     except:

@@ -90,6 +90,7 @@ if __name__ == '__main__':
             path = "../TelevisionNews/"
             index = config_params["es_index"]
 
+            delete_index(es, index)
             build_index(es, index, path)
 
             # TODO - need to add types of queries
@@ -109,4 +110,3 @@ if __name__ == '__main__':
             query = "brazil's government is defending its plan to build dozens of huge hydro-electric dams"
             res = search_snippet(query)
             print(json.dumps(res, indent = 3))
-            # delete_index(es, index)
