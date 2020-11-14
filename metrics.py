@@ -2,8 +2,6 @@ import query
 from Elasticsearch.ES import search_snippet
 import json
 
-
-
 def metrics(query_string):
   """
   A helper function to obtain performance metrics for the search engine for a particular query.
@@ -20,6 +18,7 @@ def metrics(query_string):
   fn = len(es_doc_ids) - tp
   tn = query.index.ndocs - tp - fp - fn
   return (tp, fp, fn, tn)
+
 if __name__ == "__main__":
   print(metrics("brazil's government was defending its plan to build dozens of huge hydro-electric dams"))
-  #print(metrics("sea animals are dying in the ocean"))
+  # print(metrics("sea animals are dying in the ocean"))

@@ -23,7 +23,6 @@ def generate_actions(path):
     uid = 0
     for _csv in sorted(os.listdir(path)):
         file = os.path.join(path, _csv)
-        # print(csv)
         with open(file, mode = "r") as f:
             reader = csv.DictReader(f)
             for row in reader:
@@ -44,10 +43,11 @@ def generate_actions(path):
 
 def build_index(es, index, path):
     """ builds ES index """
-    successes = 0
-    for ok, action in helpers.streaming_bulk(es, index=index, actions=generate_actions(path),):
-        successes += ok
-    print("Indexed %d documents" % (successes))
+    if index not in cat_indices():
+        successes = 0
+        for ok, action in helpers.streaming_bulk(es, index=index, actions=generate_actions(path),):
+            successes += ok
+        print("Indexed %d documents" % (successes))
 
 def delete_index(es, index):
     """ deletes ES index """
@@ -81,31 +81,32 @@ def search_snippet(query):
     res = search(json.dumps(search_object))
     return res
 
-
-
 es = Elasticsearch([{'host': config_params['es_host'], 'port': config_params['es_port']}])
-
 
 if __name__ == '__main__':
     # connect to our cluster
     if es is not None:
             # print(help(build_index))
-            path = "TelevisionNews/"
+            path = "../TelevisionNews/"
             index = config_params["es_index"]
-            if config_params["es_index"] not in cat_indices():
-                build_index(es, index, path)
+
+            build_index(es, index, path)
 
             # TODO - need to add types of queries
             # search_object = {"size": 10000, query": {"match_all": {}}}
-            search_object = {
-                "size" : 20,
-                "query": {
-                    "multi_match": {
-                        "query" : "brazil's government is defending its plan to build dozens of huge hydro-electric dams",
-                        "fields" : ["Snippet"]
-                    }
-                }
-            }
-            res = search(es, index, json.dumps(search_object))
+            # search_object = {
+            #     "size" : 20,
+            #     "query": {
+            #         "multi_match": {
+            #             "query" : "brazil's government is defending its plan to build dozens of huge hydro-electric dams",
+            #             "fields" : ["Snippet"]
+            #         }
+            #     }
+            # }
+            # res = search(json.dumps(search_object))
+            # print(json.dumps(res, indent = 3))
+
+            query = "brazil's government is defending its plan to build dozens of huge hydro-electric dams"
+            res = search_snippet(query)
             print(json.dumps(res, indent = 3))
             # delete_index(es, index)
