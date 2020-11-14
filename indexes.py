@@ -100,7 +100,6 @@ class TFIDFIndex(Index):
     ranked_docs = sorted(ranked_docs, key = lambda x : x[1], reverse = True)
     threshold_docs = list(filter(lambda x : x[1]>config_params["threshold_score"], ranked_docs))
     #return docs with score>threshold, or the top 10% docs
-    print(len(ranked_docs))
     return threshold_docs if len(threshold_docs) else ranked_docs[:len(ranked_docs)//10 + 1]
 
 class BooleanQuery(Index):
@@ -148,6 +147,26 @@ class BooleanQuery(Index):
     return ans
 
   def query(self, query_string):
+    not_queries=[]
+    good_queries=[]
+    if 'OR' in query_string:
+      queries=query_string.split('OR')
+    else:
+      queries=[query_string]
+    for query in queries:
+
+      if 'NOT' in query:
+        query_=query.split('NOT')
+        not_queries.extend(self.break_query(query_[1][1:-1]))
+        good_queries.extend(self.break_query(query_[0]))
+      else:
+        good_queries.extend(self.break_query(query))
+    good_queries=set(good_queries)
+    not_queries=set(not_queries)
+    good_queries=good_queries.difference(not_queries)
+    return list(good_queries) 
+
+  def break_query(self, query_string):
     star_flag=0
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)

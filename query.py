@@ -156,7 +156,7 @@ def main(query):
 
 if __name__ == "__main__":
   # query = "`bbcnews` brazil's government was defending its plan to build dozens of huge hydro-electric dams"
-  query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+  query = "brazil's government was defending OR potent than carbon dioxide that undermines the greenhouse gas advantage. reporter: bottom line"
   # query = "<BBCNEWS.201701> brazil's government is defending its plan to build dozens of huge"
   #query = input()
   #query="scientific community"
@@ -175,6 +175,5 @@ if __name__ == "__main__":
       "show":doclist['hits'][0]["_source"]['Show'],
       "document": doclist['hits'][0]["_source"]["document_name"],
       "rowid" : doclist['hits'][0]["_source"]['Snippet'],
-      "row_snippet" : doclist['hits'][0]["_source"]['id']
-    }, ignore_index = True)
+      "row_snippet" : doclist['hits'][0]["_source"]['id']}, ignore_index = True)
     df.to_csv(os.path.join("data", "prev_queries.csv"), index = None)
