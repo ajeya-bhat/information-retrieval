@@ -4,19 +4,53 @@ import re
 import random
 import pickle
 
-# hello there
-
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.timer import timer_decorator
 import metrics
 
-f = open('data/data.pkl', 'rb')
-snippets = pickle.load(f)['rowsnip']
-f.close()
-# for key in snippets:
-#     if(key > 10):
-#         break
-#     print(key, snippets[key])
+def compare_scores(snippets):
+    corpus = ''.join(snippets)
+    # print(corpus)
+    corpus_list = corpus.split('.')
+    # print(corpus_list)
+    # (tp, fp, fn, tn)
+    scores_dict = dict()
+    for i in range(0,10):
+        query = random.choice(corpus_list)
+        # query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+        print(query, end = ' ')
+        scores = metrics.metrics(query)
+        precision = scores[0] / (scores[0] + scores[1])
+        recall = scores[0] / (scores[0] + scores[2])
+        if(precision or recall):
+            F1 = 2*precision*recall/(precision + recall)
+            if(F1 >= 0.4):
+                scores_dict[query] = F1
+        else:
+            F1 = 0
+        print('F1-score', F1)
+        return scores_dict
 
-# snippets = list(rowsnip.values())[0:10]
-# print(snippets)
+def compare(snippets):
+    try:
+        print('in try block')
+        f = open('data/scores.pkl', 'rb')
+        scores_dict = pickle.load(f)
+        f.close()
+        scores_dict.update(compare_scores(snippets))
+    except:
+        print('in except')
+        scores_dict = compare_scores(snippets)
+        # print(scores_dict)
+    finally:
+        print('in finally')
+        print(scores_dict)
+        f = open('data/scores.pkl', 'wb')
+        pickle.dump(scores_dict, f)
+        f.close()
+
+if __name__ == "__main__":
+    f = open('data/data.pkl', 'rb')
+    snippets = list(pickle.load(f)['rowsnip'].values())[0:5]
+    f.close()
+    compare(snippets)

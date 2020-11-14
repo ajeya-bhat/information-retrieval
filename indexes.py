@@ -164,7 +164,7 @@ class BooleanQuery(Index):
     good_queries=set(good_queries)
     not_queries=set(not_queries)
     good_queries=good_queries.difference(not_queries)
-    return list(good_queries) 
+    return list(good_queries)
 
   def break_query(self, query_string):
     star_flag=0
