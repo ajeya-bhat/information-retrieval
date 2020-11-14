@@ -100,7 +100,6 @@ class TFIDFIndex(Index):
     ranked_docs = sorted(ranked_docs, key = lambda x : x[1], reverse = True)
     threshold_docs = list(filter(lambda x : x[1]>config_params["threshold_score"], ranked_docs))
     #return docs with score>threshold, or the top 10% docs
-    print(len(ranked_docs))
     return threshold_docs if len(threshold_docs) else ranked_docs[:len(ranked_docs)//10 + 1]
 
 class BooleanQuery(Index):
@@ -157,7 +156,9 @@ class BooleanQuery(Index):
     for query in queries:
 
       if 'NOT' in query:
-        not_queries.extend(self.break_query(query))
+        query_=query.split('NOT')
+        not_queries.extend(self.break_query(query_[1][1:-1]))
+        good_queries.extend(self.break_query(query_[0]))
       else:
         good_queries.extend(self.break_query(query))
     good_queries=set(good_queries)
