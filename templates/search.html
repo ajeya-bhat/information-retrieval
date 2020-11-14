@@ -102,9 +102,9 @@
                 this.response.hits.forEach(ele =>{
                   newdiv = document.createElement("div");
                   newdiv.innerHTML = `
-                    <h3>${ele.document_name.substring(15,) + "/" + ele.show}</h3>
+                    <h3>${ele._source.document_name + "/" + ele._source.Show}</h3>
                     
-                    <p>${ele.snippet}</p>
+                    <p>${ele._source.Snippet}</p>
                   `;
                   document.querySelector("#results").appendChild(newdiv)
                 });
