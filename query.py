@@ -117,10 +117,7 @@ def main(query):
   elif config_params['preprocess_type']==3:
     json_res['preprocessing']="none"
 
-  if config_params['spell_check']==1:
-    json_res['spell_check']=True
-  else:
-    json_res['spell_check']=False
+  json_res['spell_check']=config_params['spell_check']
 
   if config_params['tf_scheme']==1:
     json_res['tf_scheme']="Normal TF"
@@ -130,10 +127,10 @@ def main(query):
     json_res['tf_scheme']="log(1+tf)"
 
 
-  if len(docs)>100:
-    json_res['number_of_hits']='20+'
-  else:
+  if len(docs)<config_params['result_size']:
     json_res['number_of_hits']=len(docs)
+  else:
+    json_res['number_of_hits']=config_params['result_size']
 
   if(len(docs)>config_params['result_size']):
     docs=docs[:config_params['result_size']]

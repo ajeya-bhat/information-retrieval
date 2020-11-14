@@ -4,7 +4,7 @@ config_params={
   "index" : 1,
   "tf_scheme" : 1,
   "threshold_score" : 0,
-  "spell_check" : 1,
+  "spell_check" : False,
   "es_index" : "perf_test",
   "result_size" : 20,
   "es_host" : "localhost",
