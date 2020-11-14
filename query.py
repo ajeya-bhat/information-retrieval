@@ -67,7 +67,7 @@ def prepare_query(query):
   query, filters = preprocess_query(query)
   if filters['document'] is not None:
     for j in data_dict['rowterms']:
-      if data_dict['rowdict'][j][1].split(os.path.sep)[1][:-4] == filters['document']:
+      if data_dict['rowdict'][j][1][:-4] == filters['document']:
         new_rowterm_dict[j]=data_dict['rowterms'][j]
   else:
     new_rowterm_dict=data_dict['rowterms']
@@ -142,12 +142,12 @@ def main(query):
 
   json_res['hits']=[]
   for j in range(len(docs)):
-    resdict={}
-    resdict['id']=data_dict['rowdict'][docs[j]][0]
-    resdict['document_name']=data_dict['rowdict'][docs[j]][1]
-    resdict['station']=data_dict['rowdict'][docs[j]][2]
-    resdict['show']=data_dict['rowdict'][docs[j]][3]
-    resdict['snippet']=data_dict['rowsnip'][docs[j]]
+    resdict={"_source":{}}
+    resdict["_source"]['id']=data_dict['rowdict'][docs[j]][0]
+    resdict["_source"]['document_name']=data_dict['rowdict'][docs[j]][1]
+    resdict["_source"]['Station']=data_dict['rowdict'][docs[j]][2]
+    resdict["_source"]['Show']=data_dict['rowdict'][docs[j]][3]
+    resdict["_source"]['Snippet']=data_dict['rowsnip'][docs[j]]
     if config_params['index']==1:
       resdict['score']=scores[j]
     json_res['hits'].append(resdict)
