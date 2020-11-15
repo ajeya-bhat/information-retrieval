@@ -1,7 +1,15 @@
 import pickle
 
 class BSTNode:
+  """
+  A utility class for BSTs.
+  """
   def __init__(self, token_list):
+    """__init__.
+    Constructor.
+    Creates a balanced BST from the list of tokens token_list.
+    :param token_list: A list of tokens.
+    """
     #token list is a nonempty, sorted list of token strings
     mid = len(token_list)//2
     self.l = self.r = None
@@ -12,6 +20,12 @@ class BSTNode:
       self.r = BSTNode(token_list[mid+1:])
 
   def search(self, string):
+    """search.
+    A lower bound function. Finds the lower bound for the element "string"
+    in the tree rooted at this node.
+    :param string: A query term string
+    """
+
     if self.val == string:
       return self
     if self.val > string:
@@ -23,27 +37,33 @@ class BSTNode:
         return None
       return self.r.search(string)
 
-def minValue(node):
-    current = node
-    # loop down to find the leftmost leaf 
-    while(current is not None):
-        if current.l is None:
-            break
-        current = current.l
-    return current
+  def minValue(self):
+    """minValue.
+    A helper function that returns the minimum value in the current subtree.
+    """
+      current = self
+      # loop down to find the leftmost leaf 
+      while(current is not None):
+          if current.l is None:
+              break
+          current = current.l
+      return current
 
-def inOrderSuccessor(root, n):
-    # Step 1 of the above algorithm 
-    if n.r is not None:
-        return minValue(n.r)
-    # Step 2 of the above algorithm 
-    succ=None
-    while(root):
-        if(root.val<n.val):
-            root=root.r
-        elif(root.val>n.val):
-            succ=root
-            root=root.l
-        else:
-            break
-    return succ
+  def inOrderSuccessor(self, n):
+    """
+    A helper function that returns the inOrderSuccessor of the element n.
+    In the tree rooted at this node.
+    """
+      if n.r is not None:
+          return n.r.minValue()
+      root = self
+      succ=None
+      while(root):
+          if(root.val<n.val):
+              root=root.r
+          elif(root.val>n.val):
+              succ=root
+              root=root.l
+          else:
+              break
+      return succ

@@ -15,7 +15,20 @@ with open("data/data.pkl", "rb") as f:
   data_dict = pickle.load(f)
 
 class Index:
+  """
+  A base class for different indexes.
+  The constructor expects a corpus dictionary with doc_id : [terms list] mapping
+  Query function returns a list of matching doc id's.
+
+  """
   def process_spell_errors(self, query):
+    """
+    Process the query string and replace spell errors with words from the
+    corpus / english dictionary.
+
+    query: A query string.
+
+    """
     if config_params['spell_check']:
       split_query = query.split()
       result = []
@@ -45,7 +58,11 @@ class TFIDFIndex(Index):
   idf = defaultdict(set)    #idf[term] = idf(term)
   ndocs = 0
 
-  def __init__(self, corpus_dictionary, scheme = ""):
+  def __init__(self, corpus_dictionary):
+    """__init__.
+     The constructor for TFIDF index
+    :param corpus_dictionary: A dictionary with doc_id : [term_list] mapping
+    """
 
     self.ndocs = len(corpus_dictionary)
     self.scheme = scheme
@@ -60,6 +77,10 @@ class TFIDFIndex(Index):
       self.idf[term] = log10(self.ndocs/len(self.idf[term]) + 1e-10)
 
   def tfidf_score(self, tf, idf):
+    """tfidf_score. - Returns the TFIDF partial score based on the scheme.
+    :param tf: Term Frequency
+    :param idf: Inverse document frequency
+    """
     if config_params['tf_scheme'] == 1:
       tf_idf=tf*idf
     if config_params['tf_scheme'] == 2:
@@ -69,6 +90,10 @@ class TFIDFIndex(Index):
     return tf_idf
 
   def query(self, query_string):
+    """query the tfidf index  and return the list of matching doc IDs.
+
+    :param query_string: A query string
+    """
     #returns a sorted list of docids, with decreasing cosine similarity
     query_string = self.process_spell_errors(query_string)
 
@@ -104,6 +129,11 @@ class TFIDFIndex(Index):
     return threshold_docs if len(threshold_docs) else ranked_docs[:len(ranked_docs)//10 + 1]
 
 class BooleanQuery(Index):
+  """
+  BooleanQuery Index.
+
+  """
+
   index = defaultdict(set) #index[term][docid] = tf(doc, term)
   ndocs = 0
   term_set=set()
@@ -112,6 +142,10 @@ class BooleanQuery(Index):
   term_list=[]
 
   def __init__(self, corpus_dictionary):
+    """__init__.
+    Constructor for the BooleanQuery Index.
+    :param corpus_dictionary:  A dictionary with doc_id to [token_list] mapping
+    """
 
     self.ndocs = len(corpus_dictionary)
 
@@ -127,19 +161,37 @@ class BooleanQuery(Index):
     self.reverse_tree=BSTNode(self.reverse_terms)#bst of terms reversed
 
   def query_or(self, query_terms):
+    """query_or.
+    A function that returns the union of all the doc_ids in the query terms.
+
+    :param query_terms: A list of query terms.
+    """
     query_terms.sort(key=lambda x: len(self.index[x]))
     res= list(reduce(lambda x,y:x.union(y),map(lambda x:self.index[x], query_terms)))
     return res
 
   def get_words_from_tree(self, tree, term):
+    """get_words_from_tree.
+    A helper function to retrieve a list of words from parameter "tree"
+    Using the string "term".
+
+    :param tree: A BSTNode representing the tree.
+    :param term: A string representing a wildcard query term.
+    """
     temp_terms = []
     node=tree.search(term)
     while node and node.val < term[:-1]+chr(ord(term[-1])+1):
       temp_terms.append(node.val)
-      node=bstree.inOrderSuccessor(tree, node)
+      node=tree.inOrderSuccessor(node)
     return temp_terms
 
   def update_doclist(self, result_docs, terms):
+    """update_doclist.
+    A helper function to update an existing result_docs set or create one using the docs of "terms"
+
+    :param result_docs: A set of doc_ids
+    :param terms: Query term.
+    """
     ans = set(result_docs)
     if len(result_docs)==0:
       ans.update(self.query_or(terms))
@@ -148,6 +200,13 @@ class BooleanQuery(Index):
     return ans
 
   def query(self, query_string):
+    """query.
+    A function that returns a set of doc IDs that match the given query string.
+    Works on 1 level of nesting. 
+    #TODO: Create an expression tree to handle arbitrary nesting.
+
+    :param query_string: A query string.
+    """
     not_queries=[]
     good_queries=[]
     if 'OR' in query_string:
@@ -168,6 +227,11 @@ class BooleanQuery(Index):
     return list(good_queries)
 
   def break_query(self, query_string):
+    """break_query.
+    A function to split a query based on wildcard operators
+
+    :param query_string: A query string
+    """
     star_flag=0
     query_string = self.process_spell_errors(query_string)
     query_terms = preprocess_sentence(query_string)
@@ -220,6 +284,10 @@ class BooleanQuery(Index):
     return list(set(reduce(lambda x,y:x.intersection(y),map(lambda x:self.index[x], query_terms))))
 
 class PositionalIndex(Index):
+  """PositionalIndex.
+  A positional Index implementation for queries
+
+  """
 
   def __init__(self, corpus_dictionary):
     self.ndocs = len(corpus_dictionary)
