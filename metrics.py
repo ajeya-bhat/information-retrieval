@@ -11,10 +11,10 @@ def metrics(query_string):
   es_results = search_snippet(query_string)
   es_doc_ids = {x['_source']['id'] for x in[i for i in es_results['hits']['hits']]}
   doc_ids = {x['_source']['id'] for x in [i for i in results['hits']]}
-  print(json.dumps(results, indent = 3))
+  #print(json.dumps(results, indent = 3))
 
-  print(es_doc_ids)
-  print(doc_ids)
+  #print(es_doc_ids)
+  #print(doc_ids)
   tp = len(doc_ids.intersection(es_doc_ids))
   fp = len(doc_ids) - tp
   fn = len(es_doc_ids) - tp

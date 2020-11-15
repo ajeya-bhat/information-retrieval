@@ -10,6 +10,8 @@ import os
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
 from utils.timer import timer_decorator
 from config import config_params
+from preprocess import preprocess_sentence
+from tqdm import tqdm
 
 # make sure ES is up and running
 # res = requests.get('http://localhost:9200')
@@ -21,7 +23,7 @@ def generate_actions(path):
     This function is passed into the bulk() helper to create many documents in sequence.
     """
     uid = 0
-    for _csv in sorted(os.listdir(path)):
+    for _csv in tqdm(sorted(os.listdir(path))):
         file = os.path.join(path, _csv)
         with open(file, mode = "r") as f:
             reader = csv.DictReader(f)
@@ -35,11 +37,10 @@ def generate_actions(path):
                      "Show" : row["Show"],
                      # "IAShowID" : row["IAShowID"],
                      # "IAPreviewThumb" : row["IAPreviewThumb"],
-                     "Snippet" : row["Snippet"]
+                     "Snippet" : " ".join(preprocess_sentence(row["Snippet"])) if config_params["es_preprocess"] else row['Snippet']
                 }
                 uid += 1
                 yield doc
-        print(_csv)
 
 def build_index(es, index, path):
     """ builds ES index """
@@ -87,7 +88,7 @@ if __name__ == '__main__':
     # connect to our cluster
     if es is not None:
             # print(help(build_index))
-            path = "../TelevisionNews/"
+            path = "TelevisionNews/"
             index = config_params["es_index"]
 
             delete_index(es, index)

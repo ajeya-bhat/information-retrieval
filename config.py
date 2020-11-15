@@ -1,5 +1,5 @@
 config_params={
-  'preprocess_type': 3,
+  'preprocess_type': 1,
   "stopword_removal" : 1,
   "index" : 1,
   "tf_scheme" : 1,
@@ -7,6 +7,7 @@ config_params={
   "spell_check" : False,
   "es_index" : "perf_test",
   "result_size" : 20,
+  "es_preprocess" : True,
   "es_host" : "localhost",
   "es_port" : 9200
 }

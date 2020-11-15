@@ -140,7 +140,7 @@ def main(query):
   json_res['hits']=[]
   for j in range(len(docs)):
     resdict={"_source":{}}
-    resdict["_source"]['id']=data_dict['rowdict'][docs[j]][0]
+    resdict["_source"]['id']=docs[j]
     resdict["_source"]['document_name']=data_dict['rowdict'][docs[j]][1]
     resdict["_source"]['Station']=data_dict['rowdict'][docs[j]][2]
     resdict["_source"]['Show']=data_dict['rowdict'][docs[j]][3]

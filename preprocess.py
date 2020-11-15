@@ -93,11 +93,10 @@ def get_snippets():
       continue
 
     for index, row in df.iterrows():
-      docid += 1
       rowdict[docid] = (index,  i, str(row['Station']).lower(), str(row["Show"]).lower())
       rowsnip[docid] = row["Snippet"]
       word_corpus.update(row["Snippet"].split())
-
+      docid += 1
 
   for doc in tqdm(rowsnip):
     rowterms[doc] = preprocess_sentence(rowsnip[doc])

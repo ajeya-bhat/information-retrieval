@@ -5,6 +5,8 @@ import random
 import pickle
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
+from preprocess import preprocess_sentence
+from config import config_params
 from utils.timer import timer_decorator
 import metrics
 
@@ -17,6 +19,7 @@ def compare_scores(snippets):
     scores_dict = dict()
     for i in range(0,10):
         query = random.choice(corpus_list)
+        query = " ".join(preprocess_sentence(query)) if config_params["es_preprocess"] else query
         # query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
         print(query, end = ' ')
         scores = metrics.metrics(query)
@@ -25,7 +28,7 @@ def compare_scores(snippets):
         F1 = 2*precision*recall/(precision + recall + 1e-9)
         if(F1 >= 0.4):
             scores_dict[query] = F1
-        print('F1-score', F1)
+        print(scores, 'F1-score', F1, "precision:",precision, "recall:", recall)
     return scores_dict
 
 def compare(snippets):
@@ -48,6 +51,6 @@ def compare(snippets):
 
 if __name__ == "__main__":
     f = open('data/data.pkl', 'rb')
-    snippets = list(pickle.load(f)['rowsnip'].values())[0:5]
+    snippets = list(pickle.load(f)['rowsnip'].values())
     f.close()
     compare(snippets)
