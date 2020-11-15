@@ -6,7 +6,7 @@ config_params={
   "threshold_score" : 0,
   "spell_check" : False,
   "es_index" : "perf_test",
-  "result_size" : 20,
+  "result_size" : 5,
   "es_preprocess" : False,
   "es_host" : "localhost",
   "es_port" : 9200

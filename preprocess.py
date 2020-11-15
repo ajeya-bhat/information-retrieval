@@ -41,7 +41,7 @@ def preprocess_sentence(w):
   w=w.replace('!','')
 
   # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
-  w = re.sub(r"[^a-zA-Z?.!,¿*]+", " ", w)
+  w = re.sub(r"[^a-zA-Z?.!,¿*1-9]+", " ", w)
   preprocessed_sent  = []
   w = w.strip()
   if "*" not in w:
