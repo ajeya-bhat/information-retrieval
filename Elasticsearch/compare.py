@@ -21,13 +21,16 @@ def compare_scores(snippets):
     zero_F1 = 0
     for i in range(0,50):
         query = random.choice(corpus_list)
-        if(len(query.split()) < 5 or len(query.split()) > 12):
-            continue
+        count=0
         print("iteration number:", i)
         print(query)
 
         # preprocess the query
-        query = " ".join(preprocess_sentence(query)) if config_params["es_preprocess"] else query
+        if config_params["es_preprocess"] :
+            query = " ".join(preprocess_sentence(query)) 
+        if(len(query.split()) < 4):
+            count+=1
+            continue
         scores = metrics.metrics(query)
 
         precision = scores[0] / (scores[0] + scores[1] + 1e-9)
@@ -41,7 +44,7 @@ def compare_scores(snippets):
         print('scores:', scores)
         print('F1-score:', F1, 'precision:', precision, 'recall:', recall)
         print()
-    print(F1avg/50)
+    print(F1avg/(50-count))
     print(zero_F1)
     return scores_dict
 
