@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 import sys
 import nltk
+import multiprocessing
 
 from nltk.stem import WordNetLemmatizer, PorterStemmer
 from nltk.corpus import stopwords
@@ -98,9 +99,15 @@ def get_snippets():
       word_corpus.update(row["Snippet"].split())
       docid += 1
 
-  for doc in tqdm(rowsnip):
-    rowterms[doc] = preprocess_sentence(rowsnip[doc])
 
+  pool = multiprocessing.Pool(multiprocessing.cpu_count())
+
+  for doc in tqdm(rowsnip):
+    rowterms[doc] = pool.apply_async(preprocess_sentence, (rowsnip[doc],))
+  rt  = rowterms
+  rowterms = {}
+  for i in tqdm(rt):
+    rowterms[i] = rt[i].get()
   #write the preprocessed document pickle files.
   with open(os.path.join('data', "data.pkl"), "wb") as f:
     pickle.dump({"rowsnip" : rowsnip, "rowterms":rowterms, "rowdict" : rowdict, "word_corpus" : word_corpus}, f)
