@@ -65,7 +65,6 @@ class TFIDFIndex(Index):
     """
 
     self.ndocs = len(corpus_dictionary)
-    self.scheme = scheme
 
     #build the inverted index
     for doc in corpus_dictionary:
