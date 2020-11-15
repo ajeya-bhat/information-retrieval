@@ -7,7 +7,7 @@ config_params={
   "spell_check" : False,
   "es_index" : "perf_test",
   "result_size" : 20,
-  "es_preprocess" : True,
+  "es_preprocess" : False,
   "es_host" : "localhost",
   "es_port" : 9200
 }

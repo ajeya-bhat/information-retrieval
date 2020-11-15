@@ -17,18 +17,35 @@ def compare_scores(snippets):
     # print(corpus_list)
     # (tp, fp, fn, tn)
     scores_dict = dict()
-    for i in range(0,10):
+    F1avg = 0
+    zero_F1 = 0
+    for i in range(0,50):
         query = random.choice(corpus_list)
-        query = " ".join(preprocess_sentence(query)) if config_params["es_preprocess"] else query
-        # query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
-        print(query, end = ' ')
+        count=0
+        print("iteration number:", i)
+        print(query)
+
+        # preprocess the query
+        if config_params["es_preprocess"] :
+            query = " ".join(preprocess_sentence(query)) 
+        if(len(query.split()) < 4):
+            count+=1
+            continue
         scores = metrics.metrics(query)
+
         precision = scores[0] / (scores[0] + scores[1] + 1e-9)
         recall = scores[0] / (scores[0] + scores[2] + 1e-9)
         F1 = 2*precision*recall/(precision + recall + 1e-9)
         if(F1 >= 0.4):
             scores_dict[query] = F1
-        print(scores, 'F1-score', F1, "precision:",precision, "recall:", recall)
+        if(F1 == 0.0):
+            zero_F1 += 1
+        F1avg += F1
+        print('scores:', scores)
+        print('F1-score:', F1, 'precision:', precision, 'recall:', recall)
+        print()
+    print(F1avg/(50-count))
+    print(zero_F1)
     return scores_dict
 
 def compare(snippets):

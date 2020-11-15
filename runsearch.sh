@@ -14,4 +14,3 @@ then
 else
   echo "Please enter the query string as the first parameter"
 fi 
-
