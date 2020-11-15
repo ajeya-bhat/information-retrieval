@@ -27,4 +27,3 @@ if __name__ == "__main__":
   assert len(sys.argv) == 2, "Please enter the query to run the search against"
   print(metrics(sys.argv[1]))
   # print(metrics("sea animals are dying in the ocean"))
-  print(metrics("climate change talks"))
