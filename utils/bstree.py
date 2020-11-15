@@ -37,10 +37,11 @@ class BSTNode:
         return None
       return self.r.search(string)
 
+  
   def minValue(self):
-    """minValue.
-    A helper function that returns the minimum value in the current subtree.
-    """
+      """minValue.
+        A helper function that returns the minimum value in the current subtree.
+      """
       current = self
       # loop down to find the leftmost leaf 
       while(current is not None):
@@ -50,10 +51,10 @@ class BSTNode:
       return current
 
   def inOrderSuccessor(self, n):
-    """
-    A helper function that returns the inOrderSuccessor of the element n.
-    In the tree rooted at this node.
-    """
+      """
+      A helper function that returns the inOrderSuccessor of the element n.
+      In the tree rooted at this node.
+      """
       if n.r is not None:
           return n.r.minValue()
       root = self

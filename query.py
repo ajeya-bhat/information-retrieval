@@ -7,7 +7,7 @@ import datetime
 import pandas as pd
 
 
-from utils.timer import timer_decorator
+from utils.timer import timer_decorator, timer
 from collections import defaultdict
 from config import config_params
 
@@ -147,6 +147,7 @@ Input:
 Output:
   json_res : A dictionary which has the output 
 '''
+@timer
 def main(query):
   d_dict, docs, scores = prepare_query(query)
 
@@ -205,7 +206,7 @@ def main(query):
 
 
 if __name__ == "__main__":
-  query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+  query = "NOT(brazil's government was defending its plan) to build dozens of huge hydro-electric dams"
   #query = "brazil's government was defending OR potent than carbon dioxide that undermines the greenhouse gas advantage. reporter: bottom line"
   # query = "<BBCNEWS.201701> brazil's government is defending its plan to build dozens of huge"
   #query = input()

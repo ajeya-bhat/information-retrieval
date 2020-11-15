@@ -207,23 +207,32 @@ class BooleanQuery(Index):
 
     :param query_string: A query string.
     """
-    not_queries=[]
     good_queries=[]
     if 'OR' in query_string:
       queries=query_string.split('OR')
     else:
       queries=[query_string]
+    all_list=[i for i in range(94858)]
+    all_list=set(all_list)
+    results=[]
     for query in queries:
 
       if 'NOT' in query:
-        query_=query.split('NOT')
-        not_queries.extend(self.break_query(query_[1][1:-1]))
-        good_queries.extend(self.break_query(query_[0]))
+        if query[0]!='N': 
+          query_=query.split('NOT')
+          not_queries=set(self.break_query(query_[1][1:-1]))
+          good_queries_=set(self.break_query(query_[0]))
+          good_queries_=list(good_queries_.intersection(all_list.difference(not_queries)))
+          good_queries.extend(good_queries_)
+        else:
+          brack_ind=query.index(')')
+          not_queries=set(self.break_query(query[4:brack_ind]))
+          good_queries_=set(self.break_query(query[brack_ind+1:]))
+          good_queries_=list(good_queries_.intersection(all_list.difference(not_queries)))
+          good_queries.extend(good_queries_)
       else:
         good_queries.extend(self.break_query(query))
     good_queries=set(good_queries)
-    not_queries=set(not_queries)
-    good_queries=good_queries.difference(not_queries)
     return list(good_queries)
 
   def break_query(self, query_string):

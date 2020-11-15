@@ -8,7 +8,7 @@ from pprint import pprint
 import os
 
 sys.path.insert(1, os.path.join(sys.path[0], '..'))
-from utils.timer import timer_decorator
+from utils.timer import timer_decorator, timer
 from config import config_params
 from preprocess import preprocess_sentence
 from tqdm import tqdm
@@ -69,6 +69,7 @@ def search(search):
     res = es.search(index=config_params['es_index'], body=search)
     return res
 
+@timer
 def search_snippet(query):
     search_object = {
         "size" : config_params["result_size"],
