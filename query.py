@@ -205,8 +205,8 @@ def main(query):
 
 
 if __name__ == "__main__":
-  # query = "`bbcnews` brazil's government was defending its plan to build dozens of huge hydro-electric dams"
-  query = "brazil's government was defending OR potent than carbon dioxide that undermines the greenhouse gas advantage. reporter: bottom line"
+  query = "brazil's government was defending its plan to build dozens of huge hydro-electric dams"
+  #query = "brazil's government was defending OR potent than carbon dioxide that undermines the greenhouse gas advantage. reporter: bottom line"
   # query = "<BBCNEWS.201701> brazil's government is defending its plan to build dozens of huge"
   #query = input()
   #query="scientific community"

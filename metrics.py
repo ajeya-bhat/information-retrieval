@@ -1,6 +1,7 @@
 #imports
 import query
 import json
+import sys
 
 from Elasticsearch.ES import search_snippet
 
@@ -31,6 +32,6 @@ def metrics(query_string):
   return confusion_matrix
 
 if __name__ == "__main__":
-  # print(metrics("brazil's government was defending its plan to build dozens of huge hydro-electric dams"))
+  assert len(sys.argv) == 2, "Please enter the query to run the search against"
+  print(metrics(sys.argv[1]))
   # print(metrics("sea animals are dying in the ocean"))
-  print(metrics("climate change talks"))
