@@ -1,19 +1,33 @@
+#imports
 import pickle
-from collections import defaultdict
-from config import config_params
 import indexes
 import json
-from utils.timer import timer_decorator
 import os
 import datetime
 import pandas as pd
 
+
+from utils.timer import timer_decorator
+from collections import defaultdict
+from config import config_params
+
+
 ind = None
 
+#load pickle file to retrieve preprocessed corpus
 with open(os.path.join('data', 'data.pkl'), "rb") as f:
     data_dict = pickle.load(f)
 
+'''
+This function extracts the required document name and/or the station and show name from the user query
+Inputs:
+  query : The query string input by the user
+Outputs:
+  query : The query stripped of the document name and station name
+  filters : A dictionary consisting of the document name , the station name, the show name
+'''
 def preprocess_query(query):
+
   query = query.strip()
   channel = None
   show = None
@@ -32,7 +46,6 @@ def preprocess_query(query):
     #extract the field
     bt1 = query.index('`')
     bt2 = query.index('`', query.index('`')+1)
-
     filters['channel'] = query[bt1+1:bt2]
 
     if '/' in filters['channel']:
@@ -42,21 +55,42 @@ def preprocess_query(query):
     query = query[bt2+1:]
   return query, filters
 
+
+'''
+This function filters the results which match the station and show mentioned by the user
+Inputs:
+  docs : The matching snippets' ids for the query
+  scores : The scores of the snippets returned
+  filters : A dictionary consisting of the document name , the station name, the show name
+Outputs:
+  docs : The snippets' ids which match the station name and show name
+  scores : The scores of the snippets which match the station name and show name
+'''
 def postprocess_query(docs,scores, filters):
   result = []
   score=[]
+
   if len(filters)==0:
     return docs, scores
+  
   #postprocess the docs and maintain only the ones with the given show/channel
   for i in range(len(docs)):
     if ('channel' not in filters or len(filters['channel'])==0 or data_dict['rowdict'][docs[i]][2] == filters['channel']) and \
       ('show' not in filters or len(filters['show'])==0 or data_dict['rowdict'][docs[i]][3] == filters['show']) :
+
       result.append(docs[i])
       if(config_params['index']==1):
         score.append(scores[i])
+  
   return result,scores
 
-
+'''
+This function sets the required snippets for query and also the type of index to be used
+Inputs:
+  query : The query string input by the user
+Outputs:
+  The output returned by the perform_query function.
+'''
 def prepare_query(query):
   global ind
   #load the processed pickle file
@@ -82,6 +116,18 @@ def prepare_query(query):
 
   return perform_query(new_rowterm_dict,query, filters)
 
+
+'''
+This function performs the query on the user query string and returns the relevant snippets
+Inputs:
+  new_rowterm_dict : A dictionary that has the mapping of the snippet ids and the terms of the snippets
+  query : the query string of the user
+  filters : A dictionary consisting of the document name , the station name, the show name
+Outputs:
+  new_rowterm_dict : A dictionary that has the mapping of the snippet ids and the terms of the snippets
+  docs : The snippets' ids which match the station name and show name
+  scores : The scores of the snippets which match the station name and show name
+'''
 @timer_decorator
 def perform_query(new_rowterm_dict,query, filters):
 
@@ -94,6 +140,13 @@ def perform_query(new_rowterm_dict,query, filters):
   docs, scores = postprocess_query(docs, scores, filters)
   return new_rowterm_dict, docs, scores
 
+'''
+This function formats the returned results in a similar format to the elastic serach's return format
+Input:
+  The query string of the user
+Output:
+  json_res : A dictionary which has the output 
+'''
 def main(query):
   d_dict, docs, scores = prepare_query(query)
 

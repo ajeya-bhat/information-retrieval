@@ -4,7 +4,6 @@ import numpy
 import pickle
 import os
 
-from tqdm import tqdm
 import unicodedata
 import re
 import numpy as np
@@ -12,6 +11,7 @@ import pandas as pd
 import sys
 import nltk
 
+from tqdm import tqdm
 from nltk.stem import WordNetLemmatizer, PorterStemmer
 from nltk.corpus import stopwords
 from config import config_params
@@ -27,7 +27,13 @@ lemmatizer = WordNetLemmatizer()
 ps = PorterStemmer()
 stopword_set = set(stopwords.words('english'))
 
-
+'''
+This function takes in the sentence and returns a list of words which are applied to various methods of preprocessing
+Inputs:
+  w : The input sentence
+Outputs:
+  preprocessed_sent : The preprocessed list of terms of the sentence.
+'''
 def preprocess_sentence(w):
 
   w = unicode_to_ascii(w.lower().strip())
@@ -72,6 +78,9 @@ def preprocess_sentence(w):
     #root form reductions based on condition
   return preprocessed_sent
 
+'''
+  This function generates the mappings of all snippets of the corpus, its terms and custom generated idss for the snippets and dumps them in a pickle file
+'''
 def get_snippets():
   #read the data
   #mapping from uuid to row, doc pair
@@ -83,7 +92,6 @@ def get_snippets():
   word_corpus = set()
 
   docid = 0
-
   for i in sorted(os.listdir('TelevisionNews')):
     # print(i)
     try:

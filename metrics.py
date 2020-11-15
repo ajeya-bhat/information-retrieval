@@ -1,12 +1,19 @@
+#imports
 import query
-from Elasticsearch.ES import search_snippet
 import json
 
+from Elasticsearch.ES import search_snippet
+
+"""
+A helper function to obtain performance metrics for the search engine for a particular query.
+Uses the results from elasticsearch as the true labels
+Inputs:
+  query_string : The query input of the user
+Outputs:
+  confusion_matrix : A tuple of true positive, true negative, false positive and false negative of the results returned by our search engine
+"""
 def metrics(query_string):
-  """
-  A helper function to obtain performance metrics for the search engine for a particular query.
-  Uses the results from elasticsearch as the true labels
-  """
+  
   results = query.main(query_string)
   es_results = search_snippet(query_string)
   es_doc_ids = {x['_source']['id'] for x in[i for i in es_results['hits']['hits']]}
@@ -20,7 +27,8 @@ def metrics(query_string):
   fp = len(doc_ids) - tp
   fn = len(es_doc_ids) - tp
   tn = query.ind.ndocs - tp - fp - fn
-  return (tp, fp, fn, tn)
+  confusion_matrix = (tp, fp, fn, tn)
+  return confusion_matrix
 
 if __name__ == "__main__":
   # print(metrics("brazil's government was defending its plan to build dozens of huge hydro-electric dams"))
