@@ -206,15 +206,16 @@ class BooleanQuery(Index):
 
     :param query_string: A query string.
     """
+    all_list=[i for i in range(94858)]
+    all_list=set(all_list)
     if query_string[3]=='(' and query_string[-1]==')':
-      return self.query(self, query_string[4:-1])
+      return list(all_list.difference(self.query(query_string[4:-1])))
     good_queries=[]
     if 'OR' in query_string:
       queries=query_string.split('OR')
     else:
       queries=[query_string]
-    all_list=[i for i in range(94858)]
-    all_list=set(all_list)
+
     results=[]
     for query in queries:
 
