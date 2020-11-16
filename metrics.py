@@ -18,6 +18,7 @@ def metrics(query_string):
     confusion_matrix : A tuple of true positive, true negative, false positive and false negative of the results returned by our search engine
   """
   results, happ_time = query.main(query_string)
+  #results, happ_time = query.main(query_string)
   es_results, es_time = search_snippet(query_string)
   es_doc_ids = {x['_source']['id'] for x in[i for i in es_results['hits']['hits']]}
   doc_ids = {x['_source']['id'] for x in [i for i in results['hits']]}
