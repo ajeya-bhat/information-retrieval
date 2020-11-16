@@ -3,11 +3,11 @@ import pandas as pd
 
 def populate_list(index):
     mylist = list()
-	for key in list(scores_dict.keys()):
+    for key in list(scores_dict.keys()):
         mylist.append(scores_dict[key][index])
     return mylist
 
-f = open(‘data/scores.pkl’, ‘rb’)
+f = open('data/scores.pkl', 'rb')
 scores_dict = pickle.load(f)
 f.close()
 
@@ -20,4 +20,5 @@ query_list = list(scores_dict.keys())
 
 df = pd.DataFrame({'query': query_list, 'F1_score': F1_score_list, 'precision': precision_list, 'recall': recall_list, 'happ_time': happ_time_list, 'es_time': es_time_list})
 df.to_csv('out.csv', index = False)
+
 

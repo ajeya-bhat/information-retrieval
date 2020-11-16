@@ -215,7 +215,7 @@ if __name__ == "__main__":
   #query = input()
   #query="scientific community"
 
-  doclist = main(query)
+  doclist, time = main(query)
   print(json.dumps(doclist,indent=1))
   if config_params["index"] == 1:
     if "prev_queries.csv" in os.listdir("data"):
