@@ -12,14 +12,14 @@ def home():
     return render_template("search.html")
 
 @app.route('/search', methods = ["POST"])
-def query():
+def query_string():
     """
     Route for performing queries.
     """
     reqobj = request.json
     print(reqobj)
     if reqobj['engine'] == 1:
-        return jsonify(query.main(reqobj['query'])), 200
+        return jsonify(query.main(reqobj['query'])[0]), 200
     elif reqobj['engine'] == 2:
         return jsonify(search_snippet(reqobj['query'])['hits']), 200
     else:
