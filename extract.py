@@ -19,6 +19,6 @@ es_time_list = populate_list(4)
 query_list = list(scores_dict.keys())
 
 df = pd.DataFrame({'query': query_list, 'F1_score': F1_score_list, 'precision': precision_list, 'recall': recall_list, 'happ_time': happ_time_list, 'es_time': es_time_list})
-df.to_csv('out.csv', index = False)
+df.to_csv('out_100.csv', index = False)
 
 

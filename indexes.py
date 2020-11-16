@@ -206,6 +206,8 @@ class BooleanQuery(Index):
 
     :param query_string: A query string.
     """
+    if query_string[3]=='(' and query_string[-1]==')':
+      return self.query(self, query_string[4:-1])
     good_queries=[]
     if 'OR' in query_string:
       queries=query_string.split('OR')

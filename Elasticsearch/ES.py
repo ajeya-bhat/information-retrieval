@@ -15,7 +15,6 @@ from tqdm import tqdm
 
 # make sure ES is up and running
 # res = requests.get('http://localhost:9200')
-# print(res.content)
 
 def generate_actions(path):
     """
@@ -88,7 +87,6 @@ es = Elasticsearch([{'host': config_params['es_host'], 'port': config_params['es
 if __name__ == '__main__':
     # connect to our cluster
     if es is not None:
-            # print(help(build_index))
             path = "TelevisionNews/"
             index = config_params["es_index"]
 
@@ -107,7 +105,6 @@ if __name__ == '__main__':
             #     }
             # }
             # res = search(json.dumps(search_object))
-            # print(json.dumps(res, indent = 3))
 
             query = "brazil's government is defending its plan to build dozens of huge hydro-electric dams"
             res = search_snippet(query)
