@@ -206,12 +206,13 @@ def main(query):
 
 
 if __name__ == "__main__":
-  query = "NOT(brazil's government was defending its plan) to build dozens of huge hydro-electric dams"
-  #query = "brazil's government was defending OR potent than carbon dioxide that undermines the greenhouse gas advantage. reporter: bottom line"
-  # query = "<BBCNEWS.201701> brazil's government is defending its plan to build dozens of huge"
+  #query = "NOT(brazil's government was defending)"
+  query = "brazil's government was defending OR potent than carbon dioxide that undermines the greenhouse gas advantage. reporter: bottom line"
+  #query = "<BBCNEWS.201701> brazil's government is defending its plan to build dozens of huge"
   #query = input()
   #query="scientific community"
 
+  print("The query is", query)
   doclist, time = main(query)
   print(json.dumps(doclist,indent=1))
   if config_params["index"] == 1:
