@@ -17,7 +17,6 @@ def query_string():
     Route for performing queries.
     """
     reqobj = request.json
-    print(reqobj)
     if reqobj['engine'] == 1:
         return jsonify(query.main(reqobj['query'])[0]), 200
     elif reqobj['engine'] == 2:

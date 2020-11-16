@@ -13,10 +13,7 @@ import pandas as pd
 
 def compare_scores(snippets):
     corpus = ''.join(snippets)
-    # print(corpus)
     corpus_list = corpus.split('.')
-    # print(corpus_list)
-    # (tp, fp, fn, tn)
     scores_dict = dict()
     F1avg = 0
     valid_F1 = 0
@@ -59,7 +56,6 @@ def compare(snippets):
     except:
         print('in except')
         scores_dict = compare_scores(snippets)
-        # print(scores_dict)
     finally:
         print('in finally')
         print(scores_dict)
