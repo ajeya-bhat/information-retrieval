@@ -28,15 +28,15 @@ lemmatizer = WordNetLemmatizer()
 ps = PorterStemmer()
 stopword_set = set(stopwords.words('english'))
 
-'''
-This function takes in the sentence and returns a list of words which are applied to various methods of preprocessing
-Inputs:
-  w : The input sentence
-Outputs:
-  preprocessed_sent : The preprocessed list of terms of the sentence.
-'''
-def preprocess_sentence(w):
 
+def preprocess_sentence(w):
+  """
+  This function takes in the sentence and returns a list of words which are applied to various methods of preprocessing
+  Inputs:
+    w : The input sentence
+  Outputs:
+    preprocessed_sent : The preprocessed list of terms of the sentence.
+  """
   w = unicode_to_ascii(w.lower().strip())
 
   # creating a space between a word and the punctuation following it
@@ -79,10 +79,11 @@ def preprocess_sentence(w):
     #root form reductions based on condition
   return preprocessed_sent
 
-'''
-  This function generates the mappings of all snippets of the corpus, its terms and custom generated idss for the snippets and dumps them in a pickle file
-'''
+
 def get_snippets():
+  """
+  This function generates the mappings of all snippets of the corpus, its terms and custom generated idss for the snippets and dumps them in a pickle file
+  """
   #read the data
   #mapping from uuid to row, doc pair
   rowdict = {}

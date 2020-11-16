@@ -18,16 +18,16 @@ ind = None
 with open(os.path.join('data', 'data.pkl'), "rb") as f:
     data_dict = pickle.load(f)
 
-'''
-This function extracts the required document name and/or the station and show name from the user query
-Inputs:
-  query : The query string input by the user
-Outputs:
-  query : The query stripped of the document name and station name
-  filters : A dictionary consisting of the document name , the station name, the show name
-'''
-def preprocess_query(query):
 
+def preprocess_query(query):
+  """
+  This function extracts the required document name and/or the station and show name from the user query
+  Inputs:
+    query : The query string input by the user
+  Outputs:
+    query : The query stripped of the document name and station name
+    filters : A dictionary consisting of the document name , the station name, the show name
+  """
   query = query.strip()
   channel = None
   show = None
@@ -56,17 +56,18 @@ def preprocess_query(query):
   return query, filters
 
 
-'''
-This function filters the results which match the station and show mentioned by the user
-Inputs:
-  docs : The matching snippets' ids for the query
-  scores : The scores of the snippets returned
-  filters : A dictionary consisting of the document name , the station name, the show name
-Outputs:
-  docs : The snippets' ids which match the station name and show name
-  scores : The scores of the snippets which match the station name and show name
-'''
+
 def postprocess_query(docs,scores, filters):
+  """
+  This function filters the results which match the station and show mentioned by the user
+  Inputs:
+    docs : The matching snippets' ids for the query
+    scores : The scores of the snippets returned
+    filters : A dictionary consisting of the document name , the station name, the show name
+  Outputs:
+    docs : The snippets' ids which match the station name and show name
+    scores : The scores of the snippets which match the station name and show name
+  """
   result = []
   score=[]
 
@@ -84,14 +85,15 @@ def postprocess_query(docs,scores, filters):
   
   return result,scores
 
-'''
-This function sets the required snippets for query and also the type of index to be used
-Inputs:
-  query : The query string input by the user
-Outputs:
-  The output returned by the perform_query function.
-'''
+
 def prepare_query(query):
+  """
+  This function sets the required snippets for query and also the type of index to be used
+  Inputs:
+    query : The query string input by the user
+  Outputs:
+    The output returned by the perform_query function.
+  """
   global ind
   #load the processed pickle file
   with open(os.path.join("data", "data.pkl"), "rb") as f:
@@ -117,20 +119,20 @@ def prepare_query(query):
   return perform_query(new_rowterm_dict,query, filters)
 
 
-'''
-This function performs the query on the user query string and returns the relevant snippets
-Inputs:
-  new_rowterm_dict : A dictionary that has the mapping of the snippet ids and the terms of the snippets
-  query : the query string of the user
-  filters : A dictionary consisting of the document name , the station name, the show name
-Outputs:
-  new_rowterm_dict : A dictionary that has the mapping of the snippet ids and the terms of the snippets
-  docs : The snippets' ids which match the station name and show name
-  scores : The scores of the snippets which match the station name and show name
-'''
+
 @timer_decorator
 def perform_query(new_rowterm_dict,query, filters):
-
+  """
+  This function performs the query on the user query string and returns the relevant snippets
+  Inputs:
+    new_rowterm_dict : A dictionary that has the mapping of the snippet ids and the terms of the snippets
+    query : the query string of the user
+    filters : A dictionary consisting of the document name , the station name, the show name
+  Outputs:
+    new_rowterm_dict : A dictionary that has the mapping of the snippet ids and the terms of the snippets
+    docs : The snippets' ids which match the station name and show name
+    scores : The scores of the snippets which match the station name and show name
+  """
   docs = ind.query(query)
   if config_params['index']==1:
     scores=[i[1] for i in docs]
@@ -140,15 +142,16 @@ def perform_query(new_rowterm_dict,query, filters):
   docs, scores = postprocess_query(docs, scores, filters)
   return new_rowterm_dict, docs, scores
 
-'''
-This function formats the returned results in a similar format to the elastic serach's return format
-Input:
-  The query string of the user
-Output:
-  json_res : A dictionary which has the output 
-'''
+
 @timer
 def main(query):
+  """
+  This function formats the returned results in a similar format to the elastic serach's return format
+  Input:
+    The query string of the user
+  Output:
+    json_res : A dictionary which has the output 
+  """
   d_dict, docs, scores = prepare_query(query)
 
   json_res={}
